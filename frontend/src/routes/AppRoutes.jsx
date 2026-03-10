@@ -1,106 +1,81 @@
+// src/routes/AppRoutes.jsx
 import { Routes, Route } from "react-router-dom";
 
-import Login from "../pages/Auth/Login";
+// Layout
+import AppLayout from "../components/layout/AppLayout";
 import ProtectedRoute from "../components/ProtectedRoute";
 
+// Pages
 import Dashboard from "../pages/Dashboard/Dashboard";
 
+// Academics
 import Classes from "../pages/Academics/Classes";
 import Sections from "../pages/Academics/Sections";
 import Subjects from "../pages/Academics/Subjects";
 import AcademicSessions from "../pages/Academics/AcademicSessions";
 
+// Students
 import StudentsList from "../pages/Students/StudentsList";
 import StudentForm from "../pages/Students/StudentForm";
 
+// Teachers
 import TeachersList from "../pages/Teachers/TeachersList";
 import TeacherForm from "../pages/Teachers/TeacherForm";
 
+// Attendance & Routine
 import MonthlyAttendance from "../pages/Attendance/MonthlyAttendance";
 import RoutineTable from "../pages/Routine/RoutineTable";
+
+// Fees
 import Payments from "../pages/Fees/Payments";
 
+// Auth
+import Login from "../pages/Auth/Login";
+
 export default function AppRoutes() {
-
   return (
-
     <Routes>
-
+      
+      {/* Public Route */}
       <Route path="/login" element={<Login />} />
+
+      {/* Protected Layout */}
       <Route
-        path="/"
         element={
           <ProtectedRoute>
-            <Dashboard />
+            <AppLayout />
           </ProtectedRoute>
         }
-      />
+      >
 
-      <Route 
-        path="/academics/classes" 
-        element={
-          <ProtectedRoute>
-            <Classes />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/academics/sections" 
-        element={
-          <ProtectedRoute>
-            <Sections />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/academics/subjects" 
-        element={
-          <ProtectedRoute>
-            <Subjects />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/academics/sessions" 
-        element={
-          <ProtectedRoute>
-            <AcademicSessions />
-          </ProtectedRoute>
-        } 
-      />
+        {/* Dashboard */}
+        <Route index element={<Dashboard />} />
 
-      <Route
-        path="/students"
-        element={
-          <ProtectedRoute>
-            <StudentsList />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/students/new" 
-        element={
-          <ProtectedRoute>
-            <StudentForm />
-          </ProtectedRoute>
-        } 
-      />
+        {/* Students */}
+        <Route path="students" element={<StudentsList />} />
+        <Route path="students/new" element={<StudentForm />} />
 
-      <Route 
-        path="/teachers" 
-        element={
-          <ProtectedRoute>
-            <TeachersList />
-          </ProtectedRoute>
-        } 
-      />
-      <Route path="/teachers/new" element={<ProtectedRoute><TeacherForm /></ProtectedRoute>} />
+        {/* Teachers */}
+        <Route path="teachers" element={<TeachersList />} />
+        <Route path="teachers/new" element={<TeacherForm />} />
 
-      <Route path="/attendance" element={<ProtectedRoute><MonthlyAttendance /></ProtectedRoute>} />
-      <Route path="/routine" element={<ProtectedRoute><RoutineTable /></ProtectedRoute>} />
-      <Route path="/fees" element={<ProtectedRoute><Payments /></ProtectedRoute>} />
+        {/* Academics */}
+        <Route path="academics/classes" element={<Classes />} />
+        <Route path="academics/sections" element={<Sections />} />
+        <Route path="academics/subjects" element={<Subjects />} />
+        <Route path="academics/sessions" element={<AcademicSessions />} />
+
+        {/* Attendance */}
+        <Route path="attendance" element={<MonthlyAttendance />} />
+
+        {/* Routine */}
+        <Route path="routine" element={<RoutineTable />} />
+
+        {/* Fees */}
+        <Route path="fees" element={<Payments />} />
+
+      </Route>
 
     </Routes>
-
   );
 }

@@ -59,9 +59,11 @@ frontend/
 │	│
 │   ├── components/
 │   │   ├── layout/
-│   │   │   ├── Navbar.jsx
+│   │   │   ├──AppLayout.jsx
+│   │   │   ├── Topbar.jsx
 │   │   │   ├── Sidebar.jsx
 │   │   │   └── Layout.jsx
+│   │   ├──ProtectedRoute.jsx
 │   │	│
 │   │   └── ui/
 │   │       ├── Card.jsx
@@ -111,6 +113,7 @@ frontend/
 │   │   └── constants.js
 │	│
 │   ├── App.jsx
+│   ├── index.css
 │   └── main.jsx
 │
 ├───index.html

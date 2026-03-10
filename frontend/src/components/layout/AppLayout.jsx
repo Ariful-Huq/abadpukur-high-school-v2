@@ -1,23 +1,19 @@
+import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
-import Navbar from "./Navbar";
+import Topbar from "./Topbar";
 
-export default function Layout({ children }) {
-
+export default function AppLayout() {
   return (
     <div className="flex h-screen bg-gray-100">
-
       <Sidebar />
 
       <div className="flex flex-col flex-1">
-
-        <Navbar />
+        <Topbar />
 
         <main className="p-6 overflow-y-auto flex-1">
-          {children}
+          <Outlet />
         </main>
-
       </div>
-
     </div>
   );
 }
