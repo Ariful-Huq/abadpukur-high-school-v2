@@ -1,3 +1,15 @@
-from django.shortcuts import render
+from rest_framework import viewsets
+from .models import FeeStructure, Payment
+from .serializers import FeeStructureSerializer, PaymentSerializer
 
-# Create your views here.
+
+class FeeStructureViewSet(viewsets.ModelViewSet):
+
+    queryset = FeeStructure.objects.all()
+    serializer_class = FeeStructureSerializer
+
+
+class PaymentViewSet(viewsets.ModelViewSet):
+
+    queryset = Payment.objects.all()
+    serializer_class = PaymentSerializer

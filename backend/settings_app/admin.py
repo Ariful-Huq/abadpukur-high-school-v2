@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import SchoolSettings, GradingSystem, Term
 
-# Register your models here.
+admin.site.register(SchoolSettings)
+admin.site.register(GradingSystem)
+admin.site.register(Term)
