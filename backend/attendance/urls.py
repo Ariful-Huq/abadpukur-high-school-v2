@@ -1,8 +1,11 @@
+from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import AttendanceViewSet
+from .views import AttendanceViewSet, monthly_attendance
 
 router = DefaultRouter()
+router.register(r"", AttendanceViewSet)
 
-router.register("attendance", AttendanceViewSet)
-
-urlpatterns = router.urls
+urlpatterns = [
+    path("", include(router.urls)),
+    path("monthly/", monthly_attendance),
+]
