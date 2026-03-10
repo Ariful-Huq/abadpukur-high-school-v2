@@ -1,7 +1,7 @@
 from datetime import date
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-
 
 from students.models import Student
 from teachers.models import Teacher
@@ -10,27 +10,22 @@ from fees.models import Payment
 
 
 @api_view(["GET"])
+@permission_classes([AllowAny])
 def dashboard_stats(request):
 
-    total_students = Student.objects.count()
+    students = Student.objects.count()
+    teachers = Teacher.objects.count()
 
-    total_teachers = Teacher.objects.count()
-
-    today_attendance = Attendance.objects.filter(
+    present_today = Attendance.objects.filter(
         date=date.today(),
         status="P"
     ).count()
 
-    total_fees = Payment.objects.all().count()
-
-    total_amount = sum(
-        p.amount_paid for p in Payment.objects.all()
-    )
+    total_fees = Payment.objects.count()
 
     return Response({
-        "students": total_students,
-        "teachers": total_teachers,
-        "present_today": today_attendance,
-        "total_payments": total_fees,
-        "total_fee_amount": total_amount
+        "students": students,
+        "teachers": teachers,
+        "present_today": present_today,
+        "total_fees": total_fees
     })
