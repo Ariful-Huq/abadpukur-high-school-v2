@@ -6,9 +6,14 @@ const API = axios.create({
 });
 
 API.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
+  // MUST match localStorage.setItem("access_token", ...) in your AuthContext
+  const token = localStorage.getItem("access_token"); 
+  
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+    console.log("Interceptor: Token attached to request"); // Add this for debugging
+  } else {
+    console.log("Interceptor: No token found in localStorage");
   }
   return config;
 });

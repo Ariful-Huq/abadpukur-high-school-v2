@@ -1,13 +1,19 @@
 import axios from "./axios";
 
-export const getTeachers = () => axios.get("/teachers/");
-export const getTeacher = (id) => axios.get(`/teachers/${id}/`);
+// Removed the leading "/" from all paths
+export const getTeachers = () => axios.get("teachers/");
 
-export const createTeacher = (data) =>
-  axios.post("/teachers/", data);
+export const getTeacher = (id) => axios.get(`teachers/${id}/`);
 
-export const updateTeacher = (id, data) =>
-  axios.put(`/teachers/${id}/`, data);
+export const createTeacher = (data) => 
+  axios.post("teachers/", data, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 
-export const deleteTeacher = (id) =>
-  axios.delete(`/teachers/${id}/`);
+export const updateTeacher = (id, data) => 
+  axios.patch(`teachers/${id}/`, data, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+
+export const deleteTeacher = (id) => 
+  axios.delete(`teachers/${id}/`);

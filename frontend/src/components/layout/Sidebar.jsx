@@ -1,5 +1,4 @@
 // src/components/layout/Sidebar.jsx
-
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ChevronDown, ChevronRight, ChevronLeft } from "lucide-react";
@@ -10,109 +9,119 @@ export default function Sidebar({ collapsed, setCollapsed }) {
   const [openMenu, setOpenMenu] = useState("");
 
   useEffect(() => {
-    const parent = menuItems.find((item) =>
+    if (collapsed) {
+      setOpenMenu("");
+      return;
+    }
+
+    const activeParent = menuItems.find((item) =>
       item.children?.some((child) => child.path === location.pathname)
     );
-    setOpenMenu(parent ? parent.name : "");
-  }, [location.pathname]);
+    if (activeParent) setOpenMenu(activeParent.name);
+  }, [location.pathname, collapsed]);
 
   const toggleMenu = (name) => {
-    setOpenMenu((prev) => (prev === name ? "" : name));
+    if (collapsed) {
+      setCollapsed(false);
+      setOpenMenu(name);
+    } else {
+      setOpenMenu((prev) => (prev === name ? "" : name));
+    }
+  };
+
+  const isActive = (path) => location.pathname === path;
+  
+  const isParentActive = (item) => {
+    if (item.path && isActive(item.path)) return true;
+    return item.children?.some((child) => isActive(child.path));
   };
 
   return (
     <aside
-      className={`bg-gray-800 text-white h-screen flex flex-col transition-all duration-200 ${
+      className={`bg-gray-900 text-gray-300 h-screen flex flex-col transition-all duration-300 shadow-xl border-r border-gray-800 ${
         collapsed ? "w-20" : "w-64"
       }`}
     >
-      {/* Logo + Collapse Button */}
-      <div className="relative flex items-center justify-center h-20 border-b border-gray-700">
-        <img
-          src="/AbadpukurSchoolLogo.svg"
-          alt="School Logo"
-          className={`${collapsed ? "w-8" : "w-12"} transition-all`}
-        />
-
+      {/* Logo Section */}
+      <div className="flex items-center justify-between h-20 px-4 border-b border-gray-800 mb-2">
+        {!collapsed && (
+          <div className="flex items-center gap-2 overflow-hidden">
+             <img src="/AbadpukurSchoolLogo.svg" alt="Logo" className="w-10 h-10 min-w-[40px]" />
+             <span className="font-bold text-white truncate text-sm">Abadpukur School</span>
+          </div>
+        )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="absolute right-3 p-1 rounded hover:bg-gray-700"
+          className="p-2 rounded-lg hover:bg-gray-800 transition-colors mx-auto text-gray-400 hover:text-white"
         >
-          {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+          {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
         </button>
       </div>
 
-      {/* Menu */}
-      <nav className="mt-2 flex-1 overflow-y-auto">
-
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto custom-scrollbar px-3">
         {menuItems.map((item) => {
-          const hasChildren = item.children;
-          const isParentActive =
-            item.path && location.pathname === item.path;
+          const hasChildren = !!item.children;
+          const active = isParentActive(item);
           const isOpen = openMenu === item.name;
 
           return (
-            <div key={item.name}>
+            <div key={item.name} className="mb-1">
+              {hasChildren ? (
+                <>
+                  <button
+                    onClick={() => toggleMenu(item.name)}
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all ${
+                      active 
+                        ? "bg-gray-800 text-blue-400 font-semibold" 
+                        : "hover:bg-gray-800 hover:text-white text-gray-400"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <item.icon size={20} className={active ? "text-blue-400" : "text-gray-400"} />
+                      {!collapsed && <span>{item.name}</span>}
+                    </div>
+                    {!collapsed && (isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
+                  </button>
 
-              {/* Parent without children */}
-              {!hasChildren && (
+                  {/* High-Contrast Child Menu */}
+                  {isOpen && !collapsed && (
+                    <div className="mt-1 ml-5 border-l-2 border-gray-700 space-y-1 py-1">
+                      {item.children.map((child) => {
+                        const childActive = isActive(child.path);
+                        return (
+                          <Link
+                            key={child.path}
+                            to={child.path}
+                            className={`block ml-4 px-3 py-2 text-sm rounded-md transition-all ${
+                              childActive
+                                ? "bg-blue-600 text-white font-bold shadow-md shadow-blue-900/40"
+                                : "text-gray-400 hover:text-white hover:bg-gray-800"
+                            }`}
+                          >
+                            {child.name}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </>
+              ) : (
                 <Link
                   to={item.path}
-                  className={`flex items-center gap-3 px-4 py-2 hover:bg-gray-700 ${
-                    isParentActive ? "bg-gray-700 border-l-4 border-blue-500" : ""
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
+                    isActive(item.path) 
+                      ? "bg-blue-600 text-white font-bold shadow-lg shadow-blue-900/40" 
+                      : "hover:bg-gray-800 hover:text-white text-gray-400"
                   }`}
                 >
-                  <item.icon size={18} />
-                  {!collapsed && <span>{item.name}</span>}
+                  <item.icon size={20} />
+                  {!collapsed && <span className="font-medium">{item.name}</span>}
                 </Link>
-              )}
-
-              {/* Parent with children */}
-              {hasChildren && (
-                <button
-                  onClick={() => toggleMenu(item.name)}
-                  className="w-full flex items-center justify-between px-4 py-2 hover:bg-gray-700"
-                >
-                  <div className="flex items-center gap-3">
-                    <item.icon size={18} />
-                    {!collapsed && <span>{item.name}</span>}
-                  </div>
-
-                  {!collapsed &&
-                    (isOpen ? (
-                      <ChevronDown size={16} />
-                    ) : (
-                      <ChevronRight size={16} />
-                    ))}
-                </button>
-              )}
-
-              {/* Children */}
-              {hasChildren && isOpen && !collapsed && (
-                <div className="ml-6">
-                  {item.children.map((child) => {
-                    const active = location.pathname === child.path;
-
-                    return (
-                      <Link
-                        key={child.path}
-                        to={child.path}
-                        className={`block px-4 py-2 text-sm hover:bg-gray-700 ${
-                          active
-                            ? "bg-gray-700 border-l-4 border-blue-500"
-                            : ""
-                        }`}
-                      >
-                        {child.name}
-                      </Link>
-                    );
-                  })}
-                </div>
               )}
             </div>
           );
         })}
-
       </nav>
     </aside>
   );
