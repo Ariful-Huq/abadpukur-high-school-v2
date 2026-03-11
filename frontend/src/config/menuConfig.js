@@ -1,72 +1,55 @@
+// src/config/menuConfig.js
 import {
   Home,
   Users,
   UserCheck,
   BookOpen,
-  Layers,
-  Grid,
-  Book,
-  CalendarDays,
   Clipboard,
   Calendar,
   CreditCard,
+  List,
+  FileText,
+  Layers,
+  CalendarDays,
 } from "lucide-react";
 
-export const menuConfig = [
+export const menuItems = [
   {
-    title: "Dashboard",
+    name: "Dashboard",
     icon: Home,
     path: "/",
   },
+
   {
-    title: "Students",
+    name: "Students",
     icon: Users,
-    path: "/students",
-  },
-  {
-    title: "Teachers",
-    icon: UserCheck,
-    path: "/teachers",
-  },
-  {
-    title: "Academics",
-    icon: BookOpen,
     children: [
-      {
-        title: "Classes",
-        icon: Layers,
-        path: "/academics/classes",
-      },
-      {
-        title: "Sections",
-        icon: Grid,
-        path: "/academics/sections",
-      },
-      {
-        title: "Subjects",
-        icon: Book,
-        path: "/academics/subjects",
-      },
-      {
-        title: "Academic Sessions",
-        icon: CalendarDays,
-        path: "/academics/sessions",
-      },
+      { name: "All Students", path: "/students", icon: List },
+      { name: "New Student", path: "/students/new", icon: FileText },
     ],
   },
+
   {
-    title: "Attendance",
-    icon: Clipboard,
-    path: "/attendance",
+    name: "Teachers",
+    icon: UserCheck,
+    children: [
+      { name: "All Teachers", path: "/teachers", icon: List },
+      { name: "New Teacher", path: "/teachers/new", icon: FileText },
+    ],
   },
+
   {
-    title: "Routine",
-    icon: Calendar,
-    path: "/routine",
+    name: "Academics",
+    icon: BookOpen,
+    children: [
+      { name: "Classes", path: "/academics/classes", icon: Layers },
+      { name: "Sections", path: "/academics/sections", icon: List },
+      { name: "Subjects", path: "/academics/subjects", icon: FileText },
+      { name: "Academic Sessions", path: "/academics/sessions", icon: CalendarDays },
+    ],
   },
-  {
-    title: "Fees",
-    icon: CreditCard,
-    path: "/fees",
-  },
+
+  { name: "Attendance", icon: Clipboard, path: "/attendance" },
+  { name: "Routine", icon: Calendar, path: "/routine" },
+  { name: "Fees", icon: CreditCard, path: "/fees" },
 ];

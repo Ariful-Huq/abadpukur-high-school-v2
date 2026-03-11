@@ -3,125 +3,107 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ChevronDown, ChevronRight, ChevronLeft } from "lucide-react";
-import { menuConfig } from "../../config/menuConfig";
+import { menuItems } from "../../config/menuConfig";
 
-export default function Sidebar() {
+export default function Sidebar({ collapsed, setCollapsed }) {
   const location = useLocation();
+  const [openMenu, setOpenMenu] = useState("");
 
-  const [collapsed, setCollapsed] = useState(false);
-  const [openMenus, setOpenMenus] = useState({});
-
-  // Auto-open submenu if route belongs to it
   useEffect(() => {
-    const newOpenMenus = {};
-
-    menuConfig.forEach((menu) => {
-      if (menu.children) {
-        const match = menu.children.some((child) =>
-          location.pathname.startsWith(child.path)
-        );
-
-        if (match) newOpenMenus[menu.title] = true;
-      }
-    });
-
-    setOpenMenus(newOpenMenus);
+    const parent = menuItems.find((item) =>
+      item.children?.some((child) => child.path === location.pathname)
+    );
+    setOpenMenu(parent ? parent.name : "");
   }, [location.pathname]);
 
-  const toggleMenu = (title) => {
-    setOpenMenus((prev) => ({
-      ...prev,
-      [title]: !prev[title],
-    }));
+  const toggleMenu = (name) => {
+    setOpenMenu((prev) => (prev === name ? "" : name));
   };
 
   return (
-    <div
-      className={`bg-gray-800 text-white h-screen flex flex-col transition-all duration-300 ${
+    <aside
+      className={`bg-gray-800 text-white h-screen flex flex-col transition-all duration-200 ${
         collapsed ? "w-20" : "w-64"
       }`}
     >
-      {/* Header */}
-      <div
-        className={`flex items-center ${
-          collapsed ? "justify-center" : "justify-between"
-        } p-4 border-b border-gray-700`}
-      >
-        {!collapsed && (
-          <span className="text-lg font-bold">School Admin</span>
-        )}
+      {/* Logo + Collapse Button */}
+      <div className="relative flex items-center justify-center h-20 border-b border-gray-700">
+        <img
+          src="/AbadpukurSchoolLogo.svg"
+          alt="School Logo"
+          className={`${collapsed ? "w-8" : "w-12"} transition-all`}
+        />
 
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="p-1 rounded hover:bg-gray-700"
+          className="absolute right-3 p-1 rounded hover:bg-gray-700"
         >
           {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
         </button>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 p-2 space-y-1">
-        {menuConfig.map((menu) => {
-          const Icon = menu.icon;
+      {/* Menu */}
+      <nav className="mt-2 flex-1 overflow-y-auto">
 
-          // ---------- SINGLE MENU ----------
-          if (!menu.children) {
-            const active =
-              menu.path === "/"
-                ? location.pathname === "/"
-                : location.pathname.startsWith(menu.path);
+        {menuItems.map((item) => {
+          const hasChildren = item.children;
+          const isParentActive =
+            item.path && location.pathname === item.path;
+          const isOpen = openMenu === item.name;
 
-            return (
-              <Link
-                key={menu.title}
-                to={menu.path}
-                className={`flex items-center gap-3 p-2 rounded hover:bg-gray-700 ${
-                  active ? "bg-gray-700 border-l-4 border-blue-500" : ""
-                }`}
-              >
-                <Icon size={18} />
-                {!collapsed && <span>{menu.title}</span>}
-              </Link>
-            );
-          }
-
-          // ---------- MENU WITH SUBMENU ----------
           return (
-            <div key={menu.title}>
-              <button
-                onClick={() => toggleMenu(menu.title)}
-                className="flex items-center justify-between w-full p-2 rounded hover:bg-gray-700"
-              >
-                <div className="flex items-center gap-3">
-                  <Icon size={18} />
-                  {!collapsed && <span>{menu.title}</span>}
-                </div>
+            <div key={item.name}>
 
-                {!collapsed &&
-                  (openMenus[menu.title] ? (
-                    <ChevronDown size={16} />
-                  ) : (
-                    <ChevronRight size={16} />
-                  ))}
-              </button>
+              {/* Parent without children */}
+              {!hasChildren && (
+                <Link
+                  to={item.path}
+                  className={`flex items-center gap-3 px-4 py-2 hover:bg-gray-700 ${
+                    isParentActive ? "bg-gray-700 border-l-4 border-blue-500" : ""
+                  }`}
+                >
+                  <item.icon size={18} />
+                  {!collapsed && <span>{item.name}</span>}
+                </Link>
+              )}
 
-              {/* Submenu */}
-              {openMenus[menu.title] && !collapsed && (
-                <div className="ml-4 space-y-1 text-sm">
-                  {menu.children.map((child) => {
-                    const ChildIcon = child.icon;
+              {/* Parent with children */}
+              {hasChildren && (
+                <button
+                  onClick={() => toggleMenu(item.name)}
+                  className="w-full flex items-center justify-between px-4 py-2 hover:bg-gray-700"
+                >
+                  <div className="flex items-center gap-3">
+                    <item.icon size={18} />
+                    {!collapsed && <span>{item.name}</span>}
+                  </div>
+
+                  {!collapsed &&
+                    (isOpen ? (
+                      <ChevronDown size={16} />
+                    ) : (
+                      <ChevronRight size={16} />
+                    ))}
+                </button>
+              )}
+
+              {/* Children */}
+              {hasChildren && isOpen && !collapsed && (
+                <div className="ml-6">
+                  {item.children.map((child) => {
                     const active = location.pathname === child.path;
 
                     return (
                       <Link
-                        key={child.title}
+                        key={child.path}
                         to={child.path}
-                        className={`flex items-center gap-2 p-2 rounded hover:bg-gray-700 ${
-                          active ? "bg-gray-700" : ""
+                        className={`block px-4 py-2 text-sm hover:bg-gray-700 ${
+                          active
+                            ? "bg-gray-700 border-l-4 border-blue-500"
+                            : ""
                         }`}
                       >
-                        <ChildIcon size={16} />
-                        <span>{child.title}</span>
+                        {child.name}
                       </Link>
                     );
                   })}
@@ -130,7 +112,8 @@ export default function Sidebar() {
             </div>
           );
         })}
+
       </nav>
-    </div>
+    </aside>
   );
 }

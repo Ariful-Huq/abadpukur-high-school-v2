@@ -70,8 +70,13 @@ frontend/
 │   │       ├── Table.jsx
 │   │       ├── Button.jsx
 │   │       └── Modal.jsx
+│   ├──config
+│   │   └──menuConfig.js
 │	│
 │   ├── pages/
+│   │   ├───Auth
+│   │   │   └──Login.jsx
+│   │	│
 │   │   ├── Dashboard/
 │   │   │   └── Dashboard.jsx
 │   │	│
@@ -86,6 +91,7 @@ frontend/
 │   │   │   └── StudentForm.jsx
 │   │	│
 │   │   ├── Teachers/
+│   │   │   ├── TeachersForm.jsx
 │   │   │   └── TeachersList.jsx
 │   │	│
 │   │   ├── Routine/
@@ -97,8 +103,10 @@ frontend/
 │   │   ├── Fees/
 │   │   │   └── Payments.jsx
 │   │	│
-│   │   └── Settings/
-│   │       └── SchoolSettings.jsx
+│   │   ├── Settings/
+│   │   │   └── SchoolSettings.jsx
+│   │	│
+│   │   └──index.js
 │	│
 │   ├── routes/
 │   │   └── AppRoutes.jsx

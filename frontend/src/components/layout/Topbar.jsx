@@ -1,3 +1,5 @@
+// src/components/layout/Topbar.jsx
+
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 
@@ -5,14 +7,19 @@ export default function Topbar() {
   const { user, logout } = useContext(AuthContext);
 
   return (
-    <div className="flex justify-between items-center p-4 bg-white border-b border-gray-200">
-      <h1 className="text-xl font-semibold">Welcome, {user?.username || "Admin"}</h1>
+    <header className="flex items-center justify-between bg-white border-b px-6 h-14">
+
+      <h1 className="font-semibold text-lg">
+        Welcome, {user?.username || "Admin"}
+      </h1>
+
       <button
         onClick={logout}
-        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
+        className="bg-red-500 text-white px-4 py-1.5 rounded hover:bg-red-600 transition"
       >
         Logout
       </button>
-    </div>
+
+    </header>
   );
 }

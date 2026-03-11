@@ -1,43 +1,61 @@
 // src/routes/AppRoutes.jsx
 import { Routes, Route } from "react-router-dom";
 
-// Layout
+// Layout & ProtectedRoute
 import AppLayout from "../components/layout/AppLayout";
 import ProtectedRoute from "../components/ProtectedRoute";
 
 // Pages
-import Dashboard from "../pages/Dashboard/Dashboard";
+import * as Pages from "../pages"; // resolves via src/pages/index.js
 
-// Academics
-import Classes from "../pages/Academics/Classes";
-import Sections from "../pages/Academics/Sections";
-import Subjects from "../pages/Academics/Subjects";
-import AcademicSessions from "../pages/Academics/AcademicSessions";
+// Menu config
+import { menuItems } from "../config/menuConfig";
 
-// Students
-import StudentsList from "../pages/Students/StudentsList";
-import StudentForm from "../pages/Students/StudentForm";
-
-// Teachers
-import TeachersList from "../pages/Teachers/TeachersList";
-import TeacherForm from "../pages/Teachers/TeacherForm";
-
-// Attendance & Routine
-import MonthlyAttendance from "../pages/Attendance/MonthlyAttendance";
-import RoutineTable from "../pages/Routine/RoutineTable";
-
-// Fees
-import Payments from "../pages/Fees/Payments";
-
-// Auth
-import Login from "../pages/Auth/Login";
+// Map path to component dynamically
+const pageMap = {
+  "/": Pages.Dashboard,
+  "/students": Pages.StudentsList,
+  "/students/new": Pages.StudentForm,
+  "/teachers": Pages.TeachersList,
+  "/teachers/new": Pages.TeacherForm,
+  "/academics/classes": Pages.Classes,
+  "/academics/sections": Pages.Sections,
+  "/academics/subjects": Pages.Subjects,
+  "/academics/sessions": Pages.AcademicSessions,
+  "/attendance": Pages.MonthlyAttendance,
+  "/routine": Pages.RoutineTable,
+  "/fees": Pages.Payments,
+};
 
 export default function AppRoutes() {
+  const generateRoutes = (items) => {
+    const routes = [];
+    items.forEach((item) => {
+      if (item.children) {
+        item.children.forEach((child) => {
+          const PageComponent = pageMap[child.path];
+          if (PageComponent) {
+            routes.push(
+              <Route key={child.path} path={child.path} element={<PageComponent />} />
+            );
+          }
+        });
+      } else {
+        const PageComponent = pageMap[item.path];
+        if (PageComponent) {
+          routes.push(
+            <Route key={item.path} path={item.path} element={<PageComponent />} />
+          );
+        }
+      }
+    });
+    return routes;
+  };
+
   return (
     <Routes>
-      
       {/* Public Route */}
-      <Route path="/login" element={<Login />} />
+      <Route path="/login" element={<Pages.Login />} />
 
       {/* Protected Layout */}
       <Route
@@ -47,35 +65,8 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       >
-
-        {/* Dashboard */}
-        <Route index element={<Dashboard />} />
-
-        {/* Students */}
-        <Route path="students" element={<StudentsList />} />
-        <Route path="students/new" element={<StudentForm />} />
-
-        {/* Teachers */}
-        <Route path="teachers" element={<TeachersList />} />
-        <Route path="teachers/new" element={<TeacherForm />} />
-
-        {/* Academics */}
-        <Route path="academics/classes" element={<Classes />} />
-        <Route path="academics/sections" element={<Sections />} />
-        <Route path="academics/subjects" element={<Subjects />} />
-        <Route path="academics/sessions" element={<AcademicSessions />} />
-
-        {/* Attendance */}
-        <Route path="attendance" element={<MonthlyAttendance />} />
-
-        {/* Routine */}
-        <Route path="routine" element={<RoutineTable />} />
-
-        {/* Fees */}
-        <Route path="fees" element={<Payments />} />
-
+        {generateRoutes(menuItems)}
       </Route>
-
     </Routes>
   );
 }
