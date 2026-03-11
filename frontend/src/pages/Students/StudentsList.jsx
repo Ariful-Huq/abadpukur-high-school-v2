@@ -12,9 +12,14 @@ export default function StudentsList() {
     setLoading(true);
     try {
       const res = await getStudents();
-      setStudents(res.data);
+    
+      // Extract the results array from the paginated response
+      const data = res.data.results ? res.data.results : res.data;
+    
+      setStudents(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Failed to fetch students", err);
+      setStudents([]); // Safety fallback
     } finally {
       setLoading(false);
     }

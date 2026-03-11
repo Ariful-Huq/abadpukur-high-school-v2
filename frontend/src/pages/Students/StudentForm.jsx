@@ -24,14 +24,24 @@ export default function StudentForm() {
 
   useEffect(() => {
     const loadData = async () => {
-      const [cls, sec, ses] = await Promise.all([
-        getClasses(),
-        getSections(),
-        getSessions(),
-      ]);
-      setClasses(cls.data);
-      setSections(sec.data);
-      setSessions(ses.data);
+      try {
+        const [cls, sec, ses] = await Promise.all([
+          getClasses(),
+          getSections(),
+          getSessions(),
+        ]);
+
+        // Extract .results if paginated, otherwise use the raw data
+        const classesData = cls.data.results || cls.data;
+        const sectionsData = sec.data.results || sec.data;
+        const sessionsData = ses.data.results || ses.data;
+
+        setClasses(Array.isArray(classesData) ? classesData : []);
+        setSections(Array.isArray(sectionsData) ? sectionsData : []);
+        setSessions(Array.isArray(sessionsData) ? sessionsData : []);
+      } catch (err) {
+        console.error("Error loading academic data:", err);
+      }
     };
     loadData();
   }, []);
