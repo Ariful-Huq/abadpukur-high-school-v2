@@ -19,6 +19,7 @@ export { default as TeachersList } from "./Teachers/TeachersList";
 export { default as TeacherForm } from "./Teachers/TeacherForm";
 
 // Attendance & Routine
+export { default as MarkAttendance } from "./Attendance/MarkAttendance";
 export { default as MonthlyAttendance } from "./Attendance/MonthlyAttendance";
 export { default as RoutineTable } from "./Routine/RoutineTable";
 

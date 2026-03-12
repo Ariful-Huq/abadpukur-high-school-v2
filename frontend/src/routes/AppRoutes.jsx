@@ -22,7 +22,8 @@ const pageMap = {
   "/academics/sections": Pages.Sections,
   "/academics/subjects": Pages.Subjects,
   "/academics/sessions": Pages.AcademicSessions,
-  "/attendance": Pages.MonthlyAttendance,
+  "/attendance/mark": Pages.MarkAttendance,
+  "/attendance/monthly": Pages.MonthlyAttendance,
   "/routine": Pages.RoutineTable,
   "/fees": Pages.Payments,
 };

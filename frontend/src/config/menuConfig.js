@@ -49,7 +49,15 @@ export const menuItems = [
     ],
   },
 
-  { name: "Attendance", icon: Clipboard, path: "/attendance" },
+  {
+    name: "Attendance",
+    icon: Clipboard,
+    children: [
+      { name: "Mark Attendance", path: "/attendance/mark", icon: UserCheck }, // Daily Marking
+      { name: "Monthly Report", path: "/attendance/monthly", icon: Calendar }, // The Grid
+    ],
+  },
+
   { name: "Routine", icon: Calendar, path: "/routine" },
   { name: "Fees", icon: CreditCard, path: "/fees" },
 ];

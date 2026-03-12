@@ -7,7 +7,8 @@ class Attendance(models.Model):
 
     STATUS_CHOICES = (
         ("P", "Present"),
-        ("L", "Late"),
+        ("L", "Late Entry"),
+        ("EL", "Early Leave"),
         ("A", "Absent"),
         ("LE", "Leave"),
     )

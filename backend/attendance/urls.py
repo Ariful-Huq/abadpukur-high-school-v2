@@ -6,6 +6,6 @@ router = DefaultRouter()
 router.register(r"", AttendanceViewSet)
 
 urlpatterns = [
-    path("", include(router.urls)),
     path("monthly/", monthly_attendance),
+    path("", include(router.urls)),
 ]
