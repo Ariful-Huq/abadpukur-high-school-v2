@@ -25,6 +25,7 @@ const pageMap = {
   "/attendance/mark": Pages.MarkAttendance,
   "/attendance/monthly": Pages.MonthlyAttendance,
   "/routine": Pages.RoutineTable,
+  "/routine/periods": Pages.Periods,
   "/fees": Pages.Payments,
 };
 

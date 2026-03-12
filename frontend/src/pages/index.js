@@ -18,10 +18,13 @@ export { default as StudentProfile } from "./Students/StudentProfile";
 export { default as TeachersList } from "./Teachers/TeachersList";
 export { default as TeacherForm } from "./Teachers/TeacherForm";
 
-// Attendance & Routine
+// Attendance
 export { default as MarkAttendance } from "./Attendance/MarkAttendance";
 export { default as MonthlyAttendance } from "./Attendance/MonthlyAttendance";
+
+// Routine
 export { default as RoutineTable } from "./Routine/RoutineTable";
+export { default as Periods } from "./Routine/Periods";
 
 // Fees
 export { default as Payments } from "./Fees/Payments";

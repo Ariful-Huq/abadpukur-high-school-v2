@@ -58,6 +58,13 @@ export const menuItems = [
     ],
   },
 
-  { name: "Routine", icon: Calendar, path: "/routine" },
+  { name: "Routine",
+    icon: Calendar,
+    children: [
+      {name: "Class Routine", path: "/routine" },
+      {name: "Manage Periods", path: "/routine/periods" },
+    ],
+  },
+
   { name: "Fees", icon: CreditCard, path: "/fees" },
 ];
