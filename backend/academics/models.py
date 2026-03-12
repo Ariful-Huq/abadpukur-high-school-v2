@@ -4,12 +4,19 @@ class AcademicSession(models.Model):
     name = models.CharField(max_length=100)
     start_date = models.DateField()
     end_date = models.DateField()
+    is_active = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['-start_date'] # Shows the newest session first
 
+    def save(self, *args, **kwargs):
+        # Logic: If this session is being set to active, deactivate all others
+        if self.is_active:
+            AcademicSession.objects.filter(is_active=True).update(is_active=False)
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return self.name
+        return f"{self.name} {'(Active)' if self.is_active else ''}"
 
 
 class Class(models.Model):

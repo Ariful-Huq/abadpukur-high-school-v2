@@ -66,6 +66,10 @@ export default function AppRoutes() {
         }
       >
         {generateRoutes(menuItems)}
+
+        {/* Dynamic Detail Routes */}
+        <Route path="/students/:id" element={<Pages.StudentProfile />} />
+        <Route path="/students/:id/edit" element={<Pages.StudentForm />} /> {/* Reusing StudentForm */}
       </Route>
     </Routes>
   );

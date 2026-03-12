@@ -93,18 +93,44 @@ export default function AcademicSessions() {
           </thead>
           <tbody className="divide-y divide-gray-50">
             {sessions.map((ses) => (
-              <tr key={ses.id} className="hover:bg-blue-50/30">
-                <td className="px-6 py-4 font-medium text-gray-800">{ses.name}</td>
+              <tr key={ses.id} className={`hover:bg-blue-50/30 ${ses.is_active ? 'bg-green-50/50' : ''}`}>
+                <td className="px-6 py-4 font-medium text-gray-800">
+                  <div className="flex items-center gap-3">
+                    {ses.name}
+                    {ses.is_active && (
+                      <span className="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
+                        Current
+                      </span>
+                    )}
+                  </div>
+                </td>
                 <td className="px-6 py-4 text-sm text-gray-500">
                   {ses.start_date} to {ses.end_date}
                 </td>
                 <td className="px-6 py-4 text-right">
-                  <button
-                    onClick={() => deleteSession(ses.id).then(loadSessions)}
-                    className="text-red-500 hover:bg-red-50 p-2 rounded-lg"
-                  >
-                    <Trash2 size={16} />
-                  </button>
+                  <div className="flex justify-end gap-3">
+                    {!ses.is_active && (
+                      <button
+                        onClick={async () => {
+                          try {
+                            await setActiveSession(ses.id);
+                            loadSessions();
+                          } catch (err) {
+                            alert("Failed to update session");
+                          }
+                        }}
+                        className="text-xs font-bold text-blue-600 hover:text-blue-700 hover:bg-blue-100 px-3 py-1.5 rounded-lg border border-blue-200 transition-colors"
+                      >
+                        Set Active
+                      </button>
+                    )}
+                    <button
+                      onClick={() => deleteSession(ses.id).then(loadSessions)}
+                      className="text-red-500 hover:bg-red-50 p-2 rounded-lg"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

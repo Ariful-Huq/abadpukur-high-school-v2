@@ -15,3 +15,4 @@ export const deleteSubject = (id) => axios.delete(`academics/subjects/${id}/`);
 export const getSessions = () => axios.get("academics/sessions/");
 export const createSession = (data) => axios.post("academics/sessions/", data);
 export const deleteSession = (id) => axios.delete(`academics/sessions/${id}/`);
+export const setActiveSession = (id) => axios.post(`academics/sessions/${id}/set_active/`);

@@ -118,7 +118,7 @@ export default function Sections() {
                       onClick={() => handleDelete(sec.id)}
                       className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors inline-flex items-center gap-1"
                     >
-                      <Trash2 size={16} /> <span className="text-xs font-bold uppercase">Delete</span>
+                      <Trash2 size={16} />
                     </button>
                   </td>
                 </tr>

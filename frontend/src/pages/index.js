@@ -12,6 +12,7 @@ export { default as AcademicSessions } from "./Academics/AcademicSessions";
 // Students
 export { default as StudentsList } from "./Students/StudentsList";
 export { default as StudentForm } from "./Students/StudentForm";
+export { default as StudentProfile } from "./Students/StudentProfile";
 
 // Teachers
 export { default as TeachersList } from "./Teachers/TeachersList";
