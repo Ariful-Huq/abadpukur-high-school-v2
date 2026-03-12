@@ -14,8 +14,12 @@ export default function Sections() {
     setLoading(true);
     try {
       const [secRes, clsRes] = await Promise.all([getSections(), getClasses()]);
-      setSections(secRes.data);
-      setClasses(clsRes.data);
+      
+      const sectionsData = secRes.data.results || secRes.data;
+      const classesData = clsRes.data.results || clsRes.data;
+
+      setSections(Array.isArray(sectionsData) ? sectionsData : []);
+      setClasses(Array.isArray(classesData) ? classesData : []);
     } catch (err) {
       console.error("Failed to load sections data", err);
     } finally {

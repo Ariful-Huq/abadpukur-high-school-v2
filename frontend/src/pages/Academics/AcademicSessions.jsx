@@ -12,9 +12,14 @@ export default function AcademicSessions() {
     setLoading(true);
     try {
       const res = await getSessions();
-      setSessions(res.data);
+      
+      // FIX: Extract results if paginated, otherwise use raw data
+      const data = res.data.results || res.data;
+      
+      setSessions(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error(err);
+      console.error("Error loading sessions:", err);
+      setSessions([]); // Safety fallback
     } finally {
       setLoading(false);
     }

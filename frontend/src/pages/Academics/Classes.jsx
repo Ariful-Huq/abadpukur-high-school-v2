@@ -12,7 +12,9 @@ export default function Classes() {
     setLoading(true);
     try {
       const res = await getClasses();
-      setClasses(res.data);
+      // FIX: Handle paginated vs non-paginated data
+      const data = res.data.results || res.data;
+      setClasses(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Failed to load classes", err);
     } finally {
