@@ -1,9 +1,12 @@
-import { useEffect, useState } from "react";
-import { getPeriods, getRoutines, createRoutineEntry } from "../../api/routineApi";
+import { useEffect, useState, useRef } from "react";
+import { getPeriods, getRoutines, createRoutineEntry, deleteRoutineEntry } from "../../api/routineApi";
 import { getClasses, getSections, getSubjects } from "../../api/academicsApi";
 import { getTeachers } from "../../api/teachersApi";
-import { CalendarDays, Clock, Plus, Settings, X } from "lucide-react";
+import { CalendarDays, Plus, Settings, X, Trash2, Upload, Download, FileSpreadsheet } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { jsPDF } from "jspdf";
+import ExcelJS from "exceljs";
+import autoTable from "jspdf-autotable";
 
 const DAYS = [
   { id: "sun", name: "Sunday" },
@@ -15,6 +18,7 @@ const DAYS = [
 
 export default function RoutineTable() {
   const navigate = useNavigate();
+  const fileInputRef = useRef(null);
   const [periods, setPeriods] = useState([]);
   const [routines, setRoutines] = useState([]);
   const [classes, setClasses] = useState([]);
@@ -47,9 +51,126 @@ export default function RoutineTable() {
       await createRoutineEntry(payload);
       setShowModal(false);
       loadRoutine();
+      setNewEntry({ ...newEntry, subject: "", teacher: "" });
     } catch (err) {
-      alert("Failed to save schedule.");
+      const backendError = err.response?.data?.non_field_errors?.[0] || 
+                           err.response?.data?.detail || 
+                           "Failed to save schedule. Check for conflicts.";
+      alert(backendError);
     }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to remove this slot?")) {
+      try {
+        await deleteRoutineEntry(id);
+        loadRoutine();
+      } catch (err) {
+        alert("Could not delete slot.");
+      }
+    }
+  };
+
+  // --- NEW: Download Sample Excel ---
+  const downloadSampleExcel = async () => {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Routine Template");
+
+    worksheet.columns = [
+      { header: "Day", key: "day", width: 15 },
+      { header: "Period", key: "period", width: 15 },
+      { header: "Subject", key: "subject", width: 20 },
+      { header: "Teacher", key: "teacher", width: 25 },
+    ];
+
+    // Add example data
+    worksheet.addRow({ day: "Sunday", period: periods[0]?.name || "1st", subject: subjects[0]?.name || "Math", teacher: teachers[0] ? `${teachers[0].first_name} ${teachers[0].last_name}` : "Teacher Name" });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const url = window.URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "Routine_Template.xlsx";
+    anchor.click();
+    window.URL.revokeObjectURL(url);
+  };
+
+  // --- Updated Bulk Upload Logic using ExcelJS ---
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file || !filters.class_id || !filters.section_id) return alert("Select Class/Section first!");
+
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(file);
+    const worksheet = workbook.getWorksheet(1);
+
+    let successCount = 0;
+    let errors = [];
+
+    worksheet.eachRow(async (row, rowNumber) => {
+      if (rowNumber === 1) return; // Skip Header
+
+      const rowDay = row.getCell(1).text.trim();
+      const rowPeriod = row.getCell(2).text.trim();
+      const rowSubject = row.getCell(3).text.trim();
+      const rowTeacher = row.getCell(4).text.trim();
+
+      const periodId = periods.find(p => p.name.toLowerCase() === rowPeriod.toLowerCase())?.id;
+      const subjectId = subjects.find(s => s.name.toLowerCase() === rowSubject.toLowerCase())?.id;
+      const teacherId = teachers.find(t => `${t.first_name} ${t.last_name}`.toLowerCase() === rowTeacher.toLowerCase())?.id;
+      const dayId = DAYS.find(d => d.name.toLowerCase() === rowDay.toLowerCase())?.id;
+
+      if (periodId && subjectId && teacherId && dayId) {
+        try {
+          await createRoutineEntry({
+            school_class: filters.class_id,
+            section: filters.section_id,
+            day: dayId,
+            period: periodId,
+            subject: subjectId,
+            teacher: teacherId
+          });
+          successCount++;
+        } catch (err) {
+          errors.push(`Row ${rowNumber}: ${err.response?.data?.non_field_errors?.[0] || "Conflict"}`);
+        }
+      }
+    });
+
+    alert("Upload processed. Refresh the table to see changes.");
+    loadRoutine();
+  };
+
+  // --- PDF Export Logic ---
+  const downloadPDF = () => {
+    const doc = new jsPDF("l", "mm", "a4");
+    const className = classes.find(c => c.id == filters.class_id)?.name || "";
+    const sectionName = sections.find(s => s.id == filters.section_id)?.name || "";
+
+    doc.setFontSize(16);
+    doc.text(`${className} - Section ${sectionName} Routine`, 14, 15);
+
+    const tableColumn = ["Day", ...periods.map(p => `${p.name}\n${p.start_time.slice(0,5)}`)];
+    const tableRows = DAYS.map(day => {
+      const row = [day.name];
+      periods.forEach(p => {
+        const entry = getCellContent(day.id, p.id);
+        row.push(entry ? `${entry.subject_name}\n(${entry.teacher_name})` : "-");
+      });
+      return row;
+    });
+
+    autoTable(doc, {
+      startY: 25,
+      head: [tableColumn],
+      body: tableRows,
+      theme: 'grid',
+      headStyles: { fillColor: [37, 99, 235], fontSize: 8 },
+      bodyStyles: { fontSize: 7, halign: 'center' },
+      styles: { font: "helvetica" }
+    });
+    doc.save(`Routine_${className}_${sectionName}.pdf`);
   };
 
   const getCellContent = (dayId, periodId) => {
@@ -59,12 +180,29 @@ export default function RoutineTable() {
   return (
     <div className="w-full max-w-[calc(100vw-280px)] overflow-x-hidden p-4 md:p-8">
       <div className="space-y-6">
-        {/* Header */}
         <div className="flex justify-between items-center">
           <h1 className="text-xl font-bold flex items-center gap-2">
             <CalendarDays className="text-blue-600" size={20} /> Class Routine
           </h1>
           <div className="flex gap-2">
+            <button onClick={downloadSampleExcel} className="text-emerald-600 border border-emerald-200 bg-emerald-50 px-3 py-1.5 rounded-lg flex items-center gap-2 hover:bg-emerald-100 text-xs font-medium transition-all">
+              <FileSpreadsheet size={14} /> Sample Template
+            </button>
+            <input type="file" ref={fileInputRef} hidden onChange={handleFileUpload} accept=".xlsx" />
+            <button 
+              disabled={!filters.class_id || !filters.section_id} 
+              onClick={() => fileInputRef.current.click()} 
+              className="bg-emerald-600 text-white px-3 py-1.5 rounded-lg flex items-center gap-2 hover:bg-emerald-700 disabled:bg-gray-300 text-xs font-medium transition-all"
+            >
+              <Upload size={14} /> Bulk Upload
+            </button>
+            <button 
+              disabled={routines.length === 0} 
+              onClick={downloadPDF} 
+              className="bg-gray-100 text-gray-700 border px-3 py-1.5 rounded-lg flex items-center gap-2 hover:bg-gray-200 disabled:opacity-50 text-xs font-medium transition-all"
+            >
+              <Download size={14} /> PDF
+            </button>
             <button onClick={() => navigate("/routine/periods")} className="bg-white border text-gray-600 px-3 py-1.5 rounded-lg flex items-center gap-2 hover:bg-gray-50 text-xs font-medium transition-all">
               <Settings size={14} /> Manage Periods
             </button>
@@ -76,11 +214,11 @@ export default function RoutineTable() {
 
         {/* Filters */}
         <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex gap-3">
-          <select className="border rounded-lg p-2 text-xs flex-1 bg-gray-50/50" onChange={e => setFilters({ ...filters, class_id: e.target.value })}>
+          <select className="border rounded-lg p-2 text-xs flex-1 bg-gray-50/50" value={filters.class_id} onChange={e => setFilters({ ...filters, class_id: e.target.value })}>
             <option value="">Select Class</option>
             {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
-          <select className="border rounded-lg p-2 text-xs flex-1 bg-gray-50/50" onChange={e => setFilters({ ...filters, section_id: e.target.value })}>
+          <select className="border rounded-lg p-2 text-xs flex-1 bg-gray-50/50" value={filters.section_id} onChange={e => setFilters({ ...filters, section_id: e.target.value })}>
             <option value="">Select Section</option>
             {sections.filter(s => s.school_class == filters.class_id).map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
@@ -89,7 +227,7 @@ export default function RoutineTable() {
           </button>
         </div>
 
-        {/* Condensed Grid */}
+        {/* Routine Table Grid */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="overflow-x-auto max-w-full">
             <table className="w-full border-collapse table-fixed min-w-[800px]">
@@ -113,11 +251,17 @@ export default function RoutineTable() {
                     {periods.map(period => {
                       const entry = getCellContent(day.id, period.id);
                       return (
-                        <td key={period.id} className="p-1 border-r text-center h-14 hover:bg-blue-50/20 transition-colors">
+                        <td key={period.id} className="p-1 border-r text-center h-14 hover:bg-blue-50/20 transition-colors relative group">
                           {entry ? (
-                            <div className="bg-blue-50/80 p-1.5 rounded border border-blue-100 h-full flex flex-col justify-center">
+                            <div className="bg-blue-50/80 p-1.5 rounded border border-blue-100 h-full flex flex-col justify-center relative">
                               <div className="text-[10px] font-bold text-blue-900 truncate leading-tight">{entry.subject_name}</div>
                               <div className="text-[8px] text-blue-500 font-medium truncate mt-0.5 uppercase tracking-tighter">{entry.teacher_name}</div>
+                              <button 
+                                onClick={() => handleDelete(entry.id)}
+                                className="absolute -top-1 -right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-red-600"
+                              >
+                                <Trash2 size={8} />
+                              </button>
                             </div>
                           ) : (
                             <span className="text-gray-200 text-[8px] font-medium uppercase tracking-tighter select-none">Free</span>
@@ -133,7 +277,7 @@ export default function RoutineTable() {
         </div>
       </div>
 
-      {/* Modal remains the same size for usability */}
+      {/* Manual Entry Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-2xl relative">
@@ -156,14 +300,14 @@ export default function RoutineTable() {
             </div>
             <div>
               <label className="text-[9px] font-bold text-gray-400 uppercase">Subject</label>
-              <select className="w-full border rounded-lg p-2 bg-gray-50 text-xs" onChange={e => setNewEntry({...newEntry, subject: e.target.value})}>
+              <select className="w-full border rounded-lg p-2 bg-gray-50 text-xs" value={newEntry.subject} onChange={e => setNewEntry({...newEntry, subject: e.target.value})}>
                 <option value="">Select</option>
                 {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
               </select>
             </div>
             <div>
               <label className="text-[9px] font-bold text-gray-400 uppercase">Teacher</label>
-              <select className="w-full border rounded-lg p-2 bg-gray-50 text-xs" onChange={e => setNewEntry({...newEntry, teacher: e.target.value})}>
+              <select className="w-full border rounded-lg p-2 bg-gray-50 text-xs" value={newEntry.teacher} onChange={e => setNewEntry({...newEntry, teacher: e.target.value})}>
                 <option value="">Select</option>
                 {teachers.map(t => <option key={t.id} value={t.id}>{t.first_name} {t.last_name}</option>)}
               </select>

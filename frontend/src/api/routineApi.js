@@ -5,6 +5,7 @@ export const getPeriods = () => api.get("routine/periods/");
 export const createPeriod = (data) => api.post("routine/periods/", data);
 export const deletePeriod = (id) => api.delete(`routine/periods/${id}/`);
 
+
 // Routines
 export const getRoutines = (classId, sectionId) => {
   let url = "routine/routines/";
