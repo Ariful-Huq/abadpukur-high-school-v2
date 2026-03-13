@@ -12,6 +12,7 @@ import {
   Layers,
   CalendarDays,
   Settings,
+  AlertCircle,
 } from "lucide-react";
 
 export const menuItems = [
@@ -73,6 +74,7 @@ export const menuItems = [
     children: [
       { name: "Payments", path: "/fees", icon: List },
       { name: "Setup Fees", path: "/fees/setup", icon: Settings },
+      { name: "Defaulter List", path: "/fees/defaulters", icon: AlertCircle },
     ]
   },
 ];

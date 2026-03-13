@@ -29,6 +29,7 @@ export { default as Periods } from "./Routine/Periods";
 // Fees
 export { default as FeeStructures } from "./Fees/FeeStructures";
 export { default as Payments } from "./Fees/Payments";
+export { default as DefaulterList } from "./Fees/DefaulterList";
 
 // Auth (optional, if you want)
 export { default as Login } from "./Auth/Login";

@@ -28,6 +28,7 @@ const pageMap = {
   "/routine/periods": Pages.Periods,
   "/fees": Pages.Payments,
   "/fees/setup": Pages.FeeStructures,
+  "/fees/defaulters": Pages.DefaulterList,
 };
 
 export default function AppRoutes() {
