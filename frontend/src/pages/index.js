@@ -27,6 +27,7 @@ export { default as RoutineTable } from "./Routine/RoutineTable";
 export { default as Periods } from "./Routine/Periods";
 
 // Fees
+export { default as FeeStructures } from "./Fees/FeeStructures";
 export { default as Payments } from "./Fees/Payments";
 
 // Auth (optional, if you want)

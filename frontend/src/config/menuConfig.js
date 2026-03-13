@@ -11,6 +11,7 @@ import {
   FileText,
   Layers,
   CalendarDays,
+  Settings,
 } from "lucide-react";
 
 export const menuItems = [
@@ -66,5 +67,12 @@ export const menuItems = [
     ],
   },
 
-  { name: "Fees", icon: CreditCard, path: "/fees" },
+  { 
+    name: "Fees", 
+    icon: CreditCard, 
+    children: [
+      { name: "Payments", path: "/fees", icon: List },
+      { name: "Setup Fees", path: "/fees/setup", icon: Settings },
+    ]
+  },
 ];
