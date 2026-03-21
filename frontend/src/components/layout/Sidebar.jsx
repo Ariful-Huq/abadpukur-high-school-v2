@@ -46,7 +46,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
       <div className="flex items-center justify-between h-20 px-4 border-b border-gray-800 mb-2">
         {!collapsed && (
           <div className="flex items-center gap-2 overflow-hidden">
-             <img src="/AbadpukurSchoolLogo.svg" alt="Logo" className="w-10 h-10 min-w-[40px]" />
+             <img src="/abadpukur-high-school-logo.svg" alt="Logo" className="w-10 h-10 min-w-[40px]" />
              <span className="font-bold text-white truncate text-sm">Abadpukur School</span>
           </div>
         )}
