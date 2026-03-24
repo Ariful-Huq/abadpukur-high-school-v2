@@ -1,6 +1,7 @@
+# backend/users/serializers.py
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from .models import User
+from .models import User, AuditLog
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -37,3 +38,15 @@ class UserSerializer(serializers.ModelSerializer):
             instance.set_password(password) # Hash if password is being changed
         instance.save()
         return instance
+
+class AuditLogSerializer(serializers.ModelSerializer):
+    # Use CharField to get the username string
+    performed_by_name = serializers.CharField(source='performed_by.username', read_only=True)
+
+    class Meta:
+        model = AuditLog
+        fields = [
+            'id', 'performed_by', 'performed_by_name', 
+            'action', 'target_model', 'target_id', 
+            'description', 'timestamp'
+        ]

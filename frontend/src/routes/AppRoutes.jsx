@@ -31,6 +31,7 @@ const pageMap = {
   "/fees/setup": Pages.FeeStructures,
   "/fees/defaulters": Pages.DefaulterList,
   "/users": Pages.UserManagement,
+  "/audit-logs": Pages.LogManagement,
 };
 
 export default function AppRoutes() {

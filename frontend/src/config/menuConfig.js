@@ -6,6 +6,7 @@ import {
   UserCircle,
   BookOpen,
   Clipboard,
+  ClipboardList,
   Calendar,
   CreditCard,
   List,
@@ -37,6 +38,7 @@ export const menuItems = [
   {
     name: "Teachers",
     icon: UserCheck,
+    roles: ["admin"], // Admin only
     children: [
       { name: "All Teachers", path: "/teachers", icon: List },
       { name: "New Teacher", path: "/teachers/new", icon: FileText },
@@ -46,6 +48,7 @@ export const menuItems = [
   {
     name: "Academics",
     icon: BookOpen,
+    roles: ["admin"], // Admin only
     children: [
       { name: "Classes", path: "/academics/classes", icon: Layers },
       { name: "Sections", path: "/academics/sections", icon: List },
@@ -87,6 +90,13 @@ export const menuItems = [
     name: "Users",
     icon: UserCircle, // Using the Users icon from lucide
     path: "/users",
+    roles: ["admin"], // ONLY admins see this
+  },
+
+  {
+    name: "Logs",
+    icon: ClipboardList, // Using the ClipboardList icon from lucide
+    path: "/audit-logs",
     roles: ["admin"], // ONLY admins see this
   },
 ];
