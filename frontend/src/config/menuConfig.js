@@ -3,6 +3,7 @@ import {
   Home,
   Users,
   UserCheck,
+  UserCircle,
   BookOpen,
   Clipboard,
   Calendar,
@@ -20,11 +21,13 @@ export const menuItems = [
     name: "Dashboard",
     icon: Home,
     path: "/",
+    roles: ["admin", "teacher", "staff"], // Visible to all staff
   },
 
   {
     name: "Students",
     icon: Users,
+    roles: ["admin"], // Admin only
     children: [
       { name: "All Students", path: "/students", icon: List },
       { name: "New Student", path: "/students/new", icon: FileText },
@@ -54,6 +57,7 @@ export const menuItems = [
   {
     name: "Attendance",
     icon: Clipboard,
+    roles: ["admin", "teacher"], // Teachers can mark attendance
     children: [
       { name: "Mark Attendance", path: "/attendance/mark", icon: UserCheck }, // Daily Marking
       { name: "Monthly Report", path: "/attendance/monthly", icon: Calendar }, // The Grid
@@ -70,11 +74,19 @@ export const menuItems = [
 
   { 
     name: "Fees", 
-    icon: CreditCard, 
+    icon: CreditCard,
+    roles: ["admin"], // Hide from teachers 
     children: [
       { name: "Payments", path: "/fees", icon: List },
       { name: "Setup Fees", path: "/fees/setup", icon: Settings },
       { name: "Defaulter List", path: "/fees/defaulters", icon: AlertCircle },
     ]
+  },
+
+  {
+    name: "Users",
+    icon: UserCircle, // Using the Users icon from lucide
+    path: "/users",
+    roles: ["admin"], // ONLY admins see this
   },
 ];

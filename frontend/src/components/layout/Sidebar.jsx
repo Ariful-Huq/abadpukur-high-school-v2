@@ -1,12 +1,20 @@
 // src/components/layout/Sidebar.jsx
-import { useState, useEffect } from "react";
+import { useContext, useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ChevronDown, ChevronRight, ChevronLeft } from "lucide-react";
 import { menuItems } from "../../config/menuConfig";
+import { AuthContext } from "../../context/AuthContext";
 
 export default function Sidebar({ collapsed, setCollapsed }) {
+  const { user } = useContext(AuthContext); // Get logged-in user
   const location = useLocation();
   const [openMenu, setOpenMenu] = useState("");
+
+  // Logic: Filter menu items based on the user's role
+  const filteredMenuItems = menuItems.filter(item => {
+    if (!item.roles) return true; // Show if no roles specified
+    return item.roles.includes(user?.role);
+  });
 
   useEffect(() => {
     if (collapsed) {
@@ -60,7 +68,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto custom-scrollbar px-3">
-        {menuItems.map((item) => {
+        {filteredMenuItems.map((item) => {
           const hasChildren = !!item.children;
           const active = isParentActive(item);
           const isOpen = openMenu === item.name;

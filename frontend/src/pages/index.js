@@ -31,5 +31,8 @@ export { default as FeeStructures } from "./Fees/FeeStructures";
 export { default as Payments } from "./Fees/Payments";
 export { default as DefaulterList } from "./Fees/DefaulterList";
 
+// Users
+export { default as UserManagement } from "./Users/UserManagement";
+
 // Auth (optional, if you want)
 export { default as Login } from "./Auth/Login";
