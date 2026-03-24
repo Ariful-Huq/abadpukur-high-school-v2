@@ -1,3 +1,4 @@
+# backend/users/models.py
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
@@ -34,6 +35,10 @@ class AuditLog(models.Model):
     target_id = models.CharField(max_length=50, null=True)
     description = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
 
     class Meta:
         ordering = ['-timestamp']
+    
+    def __str__(self):
+        return f"{self.action} by {self.performed_by} from {self.ip_address}"

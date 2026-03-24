@@ -20,9 +20,10 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "username", "password", "first_name", "last_name", "role", "phone", "is_active"]
+        fields = ["id", "username", "password", "first_name", "last_name", "role", "phone", "is_active", "last_login"]
         extra_kwargs = {
-            "password": {"write_only": True, "required": False}
+            "password": {"write_only": True, "required": False},
+            "last_login": {"read_only": True}
         }
 
     def create(self, validated_data):
@@ -48,5 +49,5 @@ class AuditLogSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'performed_by', 'performed_by_name', 
             'action', 'target_model', 'target_id', 
-            'description', 'timestamp'
+            'description', 'timestamp', 'ip_address'
         ]

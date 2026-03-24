@@ -1,9 +1,11 @@
+// src/pages/Users/UserManagement.jsx
 import { useState, useEffect } from "react";
 import API from "../../api/axios";
+import { formatDistanceToNow } from "date-fns"; // Standard for relative time
 import { 
   UserPlus, Edit, Trash2, Loader2, 
   ToggleLeft, ToggleRight, Search, X, 
-  ChevronUp, ChevronDown, UserCircle 
+  ChevronUp, ChevronDown, UserCircle, Clock 
 } from "lucide-react";
 
 export default function UserManagement() {
@@ -79,7 +81,7 @@ export default function UserManagement() {
     setSelectedUserId(user.id);
     setFormData({ 
       username: user.username, 
-      password: "", // Leave blank for security
+      password: "", 
       first_name: user.first_name, 
       last_name: user.last_name, 
       role: user.role, 
@@ -92,10 +94,8 @@ export default function UserManagement() {
     e.preventDefault();
     try {
       if (isEditing) {
-        // Remove password from payload if not being changed
         const payload = { ...formData };
         if (!payload.password) delete payload.password;
-        
         await API.patch(`users/users/${selectedUserId}/`, payload);
       } else {
         await API.post("users/users/", formData);
@@ -146,8 +146,7 @@ export default function UserManagement() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            <UserCircle className="text-blue-500" />
-            <span className="text-blue-500">User Management</span>
+            <UserCircle className="text-blue-500" /> <span className="text-blue-500">User Management</span>
           </h1>
           <p className="text-gray-500 text-sm">Create and manage access levels for Abadpukur High School.</p>
         </div>
@@ -188,6 +187,9 @@ export default function UserManagement() {
                 <th onClick={() => requestSort('role')} className="p-5 cursor-pointer hover:text-white transition group">
                   <div className="flex items-center gap-2">Role <SortIcon column="role"/></div>
                 </th>
+                <th onClick={() => requestSort('last_login')} className="p-5 cursor-pointer hover:text-white transition group">
+                  <div className="flex items-center justify-center gap-2">Last Login <SortIcon column="last_login"/></div>
+                </th>
                 <th className="p-5 text-center">Login Access</th>
                 <th className="p-5 text-right">Actions</th>
               </tr>
@@ -209,6 +211,15 @@ export default function UserManagement() {
                       }`}>
                         {u.role}
                       </span>
+                    </td>
+                    <td className="p-5 text-center">
+                      {u.last_login ? (
+                        <div className="text-xs text-gray-400 flex flex-col items-center gap-1">
+                          <span className="flex items-center gap-1"><Clock size={12}/> {formatDistanceToNow(new Date(u.last_login), { addSuffix: true })}</span>
+                        </div>
+                      ) : (
+                        <span className="text-[10px] text-gray-600 italic">Never logged in</span>
+                      )}
                     </td>
                     <td className="p-5">
                       <div className="flex justify-center">
@@ -242,7 +253,7 @@ export default function UserManagement() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className="p-20 text-center text-gray-600 italic">No staff found matching those criteria.</td>
+                  <td colSpan="6" className="p-20 text-center text-gray-600 italic">No staff found matching those criteria.</td>
                 </tr>
               )}
             </tbody>
