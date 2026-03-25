@@ -1,10 +1,10 @@
-from rest_framework import viewsets
+# backend/attendance/views.py
+from rest_framework import viewsets, status
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
-from rest_framework import status
 from .models import Attendance
 from .serializers import AttendanceSerializer
-from students.models import Student, Enrollment # Import these for the report
+from students.models import Student, Enrollment
 
 class AttendanceViewSet(viewsets.ModelViewSet):
     queryset = Attendance.objects.all()
@@ -12,6 +12,10 @@ class AttendanceViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'], url_path='bulk-mark')
     def bulk_mark(self, request):
+        """
+        Handles saving attendance for an entire class/section at once.
+        Uses update_or_create to prevent duplicate entries for the same day.
+        """
         attendance_data = request.data.get('attendance_list', [])
         date = request.data.get('date')
         
@@ -32,7 +36,10 @@ class AttendanceViewSet(viewsets.ModelViewSet):
 
 @api_view(["GET"])
 def monthly_attendance(request):
-    # Fix: remove the .GET attribute call
+    """
+    Generates a 31-day grid report for a specific month/year/class.
+    Used by MonthlyAttendance.jsx for the table and Excel export.
+    """
     month = request.query_params.get("month")
     year = request.query_params.get("year")
     class_id = request.query_params.get("class_id")

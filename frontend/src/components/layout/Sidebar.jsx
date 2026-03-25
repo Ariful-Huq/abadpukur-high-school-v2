@@ -6,13 +6,12 @@ import { menuItems } from "../../config/menuConfig";
 import { AuthContext } from "../../context/AuthContext";
 
 export default function Sidebar({ collapsed, setCollapsed }) {
-  const { user } = useContext(AuthContext); // Get logged-in user
+  const { user } = useContext(AuthContext);
   const location = useLocation();
   const [openMenu, setOpenMenu] = useState("");
 
-  // Logic: Filter menu items based on the user's role
   const filteredMenuItems = menuItems.filter(item => {
-    if (!item.roles) return true; // Show if no roles specified
+    if (!item.roles) return true;
     return item.roles.includes(user?.role);
   });
 
@@ -35,6 +34,10 @@ export default function Sidebar({ collapsed, setCollapsed }) {
     } else {
       setOpenMenu((prev) => (prev === name ? "" : name));
     }
+  };
+
+  const closeAllMenus = () => {
+    setOpenMenu("");
   };
 
   const isActive = (path) => location.pathname === path;
@@ -89,12 +92,21 @@ export default function Sidebar({ collapsed, setCollapsed }) {
                       <item.icon size={20} className={active ? "text-blue-400" : "text-gray-400"} />
                       {!collapsed && <span>{item.name}</span>}
                     </div>
-                    {!collapsed && (isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
+                    {!collapsed && (
+                      <ChevronRight 
+                        size={16} 
+                        className={`transition-transform duration-300 ${isOpen ? "rotate-90" : ""}`} 
+                      />
+                    )}
                   </button>
 
-                  {/* High-Contrast Child Menu */}
-                  {isOpen && !collapsed && (
-                    <div className="mt-1 ml-5 border-l-2 border-gray-700 space-y-1 py-1">
+                  {/* FIX: STANDALONE DIV FOR ANIMATION */}
+                  <div 
+                    className={`grid transition-all duration-300 ease-in-out ${
+                      isOpen && !collapsed ? "grid-rows-[1fr] opacity-100 mt-1" : "grid-rows-[0fr] opacity-0"
+                    }`}
+                  >
+                    <div className="overflow-hidden ml-5 border-l-2 border-gray-700 space-y-1 py-1">
                       {item.children.map((child) => {
                         const childActive = isActive(child.path);
                         return (
@@ -112,11 +124,12 @@ export default function Sidebar({ collapsed, setCollapsed }) {
                         );
                       })}
                     </div>
-                  )}
+                  </div>
                 </>
               ) : (
                 <Link
                   to={item.path}
+                  onClick={closeAllMenus}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
                     isActive(item.path) 
                       ? "bg-blue-600 text-white font-bold shadow-lg shadow-blue-900/40" 

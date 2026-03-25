@@ -1,3 +1,4 @@
+// src/pages/Fees/Payments.jsx
 import { useEffect, useState } from "react";
 import { getPayments, getFeeStructures, collectPayment } from "../../api/feesApi";
 import { getStudents } from "../../api/studentsApi";

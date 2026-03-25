@@ -1,3 +1,4 @@
+# backend/attendance/models.py
 from django.db import models
 from students.models import Student
 from academics.models import Class, Section

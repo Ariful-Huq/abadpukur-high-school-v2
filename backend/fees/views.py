@@ -11,5 +11,5 @@ class FeeStructureViewSet(viewsets.ModelViewSet):
 
 class PaymentViewSet(viewsets.ModelViewSet):
 
-    queryset = Payment.objects.all()
+    queryset = Payment.objects.all().order_by('-payment_date', '-id')
     serializer_class = PaymentSerializer
