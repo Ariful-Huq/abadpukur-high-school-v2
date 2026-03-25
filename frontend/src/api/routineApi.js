@@ -1,3 +1,4 @@
+// src/api/routine.js
 import api from "./axios";
 
 // Periods (Time Slots)
@@ -17,3 +18,4 @@ export const getRoutines = (classId, sectionId) => {
 
 export const createRoutineEntry = (data) => api.post("routine/routines/", data);
 export const deleteRoutineEntry = (id) => api.delete(`routine/routines/${id}/`);
+export const updateRoutineEntry = (id, data) => api.put(`routine/routines/${id}/`, data);

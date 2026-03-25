@@ -1,3 +1,4 @@
+# backend/students/models.py
 from django.db import models
 from academics.models import Class, Section, AcademicSession
 

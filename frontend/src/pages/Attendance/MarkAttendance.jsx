@@ -19,15 +19,25 @@ export default function MarkAttendance() {
 
   const handleFetchStudents = async () => {
     if (!filters.class_id || !filters.section_id) return alert("Select Class and Section");
-    const res = await getStudents(); 
-    // Filter students belonging to this class/section
-    const list = (res.data.results || res.data).filter(s => s.class_name === classes.find(c => c.id == filters.class_id)?.name);
-    setStudents(list);
     
-    // Default everyone to 'P' (Present)
-    const initial = {};
-    list.forEach(s => initial[s.id] = 'P');
-    setAttendance(initial);
+    try {
+      // Pass the IDs directly to the backend
+      const res = await getStudents(filters.class_id, filters.section_id); 
+      const list = res.data.results || res.data;
+
+      if (list.length === 0) {
+        alert("No students found for this selection.");
+      }
+
+      setStudents(list);
+      
+      // Default everyone to 'P'
+      const initial = {};
+      list.forEach(s => initial[s.id] = 'P');
+      setAttendance(initial);
+    } catch (err) {
+      alert("Error loading students from server.");
+    }
   };
 
   const toggleStatus = (studentId, status) => {

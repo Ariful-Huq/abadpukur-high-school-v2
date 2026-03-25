@@ -1,3 +1,4 @@
+# backend/routine/views.py
 from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Period, ClassRoutine

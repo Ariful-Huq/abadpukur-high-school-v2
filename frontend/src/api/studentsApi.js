@@ -1,6 +1,24 @@
+// src/api/studentsApi.js
 import axios from "./axios";
 
-export const getStudents = () => axios.get("students/");
+/**
+ * Fetches students. 
+ * Supports filtering by school_class and section IDs for attendance marking.
+ */
+export const getStudents = (classId = null, sectionId = null) => {
+  let url = "students/";
+  const params = [];
+  
+  if (classId) params.push(`school_class=${classId}`);
+  if (sectionId) params.push(`section=${sectionId}`);
+  
+  if (params.length > 0) {
+    url += `?${params.join("&")}`;
+  }
+  
+  return axios.get(url);
+};
+
 export const getStudent = (id) => axios.get(`students/${id}/`);
 
 export const createStudent = (data) =>

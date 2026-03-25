@@ -1,3 +1,4 @@
+# backend/academics/models.py
 from django.db import models
 
 class AcademicSession(models.Model):

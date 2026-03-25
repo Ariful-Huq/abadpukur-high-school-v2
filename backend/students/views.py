@@ -1,3 +1,4 @@
+# backend/students/views.py
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from .models import Student, Enrollment
@@ -7,6 +8,23 @@ from academics.models import Class, Section, AcademicSession
 class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
+
+    def get_queryset(self):
+        queryset = Student.objects.all()
+        class_id = self.request.query_params.get('school_class')
+        section_id = self.request.query_params.get('section')
+
+        # Filter students based on Enrollment records
+        if class_id and section_id:
+            # We find the IDs of students who have an active enrollment in this class/section
+            student_ids = Enrollment.objects.filter(
+                school_class_id=class_id, 
+                section_id=section_id
+            ).values_list('student_id', flat=True)
+            
+            queryset = queryset.filter(id__in=student_ids)
+            
+        return queryset
 
     def create(self, request, *args, **kwargs):
         # 1. Extract Academic IDs from the frontend request
