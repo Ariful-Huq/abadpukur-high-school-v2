@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-s=8fr79a)nsf&^(15frc-av!#fb!%j%*@)068&hvamvruj)av1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.0.105']
 
 
 # Application definition
@@ -41,10 +41,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-        # Third-party
+    # Third-party
     'rest_framework',
     'corsheaders',
     'django_filters',
+    'django_extensions',
 
     # Local apps
     'users',
@@ -138,6 +139,10 @@ STATIC_URL = 'static/'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # Vite React dev server
+    "http://192.168.0.105:19000",  # Expo LAN (check expo start QR/terminal)
+    "http://192.168.0.105:8081",   # Expo Metro bundler
+    "exp://192.168.0.105:19000",   # Expo scheme (no http)
+    # Add "*" temporarily for dev: but insecure
 ]
 
 REST_FRAMEWORK = {
@@ -148,7 +153,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-        'PAGE_SIZE': 20
+    'PAGE_SIZE': 20
 }
 
 SIMPLE_JWT = {

@@ -1,3 +1,4 @@
+# backend/teachers/views.py
 from rest_framework import viewsets
 from .models import Teacher, SubjectAssignment
 from .serializers import TeacherSerializer, SubjectAssignmentSerializer
