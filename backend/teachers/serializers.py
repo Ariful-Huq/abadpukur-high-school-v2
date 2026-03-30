@@ -1,6 +1,8 @@
+# backend/teachers/serializers.py
 from rest_framework import serializers
 from .models import Teacher, SubjectAssignment
 from academics.models import Subject
+
 
 class SubjectAssignmentSerializer(serializers.ModelSerializer):
     subject_name = serializers.ReadOnlyField(source='subject.name')
@@ -9,17 +11,19 @@ class SubjectAssignmentSerializer(serializers.ModelSerializer):
         model = SubjectAssignment
         fields = ['id', 'teacher', 'subject', 'subject_name']
 
+
 class TeacherSerializer(serializers.ModelSerializer):
     assigned_subjects = serializers.SerializerMethodField()
     # Explicitly define this so the create() method can find it in validated_data
-    subject_id = serializers.IntegerField(write_only=True, required=False, allow_null=True)
+    subject_id = serializers.IntegerField(
+        write_only=True, required=False, allow_null=True)
 
     class Meta:
         model = Teacher
         # List all fields to ensure the custom ones are included in the API
         fields = [
-            'id', 'first_name', 'last_name', 'email', 'phone', 
-            'photo', 'designation', 'qualification', 'date_of_joining', 
+            'id', 'first_name', 'last_name', 'email', 'phone',
+            'photo', 'designation', 'qualification', 'date_of_joining',
             'assigned_subjects', 'subject_id'
         ]
 
@@ -31,16 +35,18 @@ class TeacherSerializer(serializers.ModelSerializer):
         # 2. Fallback to initial_data (Raw request data)
         subject_id = validated_data.pop('subject_id', None)
         if not subject_id:
-            subject_id = self.initial_data.get('subject_id') or self.initial_data.get('subject')
+            subject_id = self.initial_data.get(
+                'subject_id') or self.initial_data.get('subject')
 
         teacher = Teacher.objects.create(**validated_data)
-    
+
         if subject_id:
             try:
                 subject = Subject.objects.get(id=subject_id)
                 # This is the line that makes "General Faculty" disappear
-                SubjectAssignment.objects.get_or_create(teacher=teacher, subject=subject)
+                SubjectAssignment.objects.get_or_create(
+                    teacher=teacher, subject=subject)
             except (Subject.DoesNotExist, ValueError):
                 print(f"DEBUG: Subject ID {subject_id} not found or invalid")
-            
+
         return teacher

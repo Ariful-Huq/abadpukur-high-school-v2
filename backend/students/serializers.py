@@ -1,5 +1,7 @@
+# backend/students/serializers.py
 from rest_framework import serializers
 from .models import Student, Enrollment
+
 
 class StudentSerializer(serializers.ModelSerializer):
     # SerializerMethodField allows us to run a small function to find related data
@@ -10,7 +12,7 @@ class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
         fields = [
-            'id', 'first_name', 'last_name', 'roll_number', 
+            'id', 'first_name', 'last_name', 'roll_number',
             'photo', 'class_name', 'section_name', 'session_name'
         ]
 

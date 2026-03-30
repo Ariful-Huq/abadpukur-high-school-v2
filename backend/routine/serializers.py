@@ -3,10 +3,12 @@ from rest_framework import serializers
 from django.core.exceptions import ValidationError
 from .models import Period, ClassRoutine
 
+
 class PeriodSerializer(serializers.ModelSerializer):
     class Meta:
         model = Period
         fields = '__all__'
+
 
 class ClassRoutineSerializer(serializers.ModelSerializer):
     period_detail = PeriodSerializer(source='period', read_only=True)
@@ -14,13 +16,15 @@ class ClassRoutineSerializer(serializers.ModelSerializer):
     subject_code = serializers.ReadOnlyField(source='subject.code')
     # Changed to SerializerMethodField to combine first and last name
     teacher_name = serializers.SerializerMethodField()
-    
+    class_name = serializers.ReadOnlyField(source='school_class.name')
+    section_name = serializers.ReadOnlyField(source='section.name')
+
     class Meta:
         model = ClassRoutine
         fields = [
-            'id', 'school_class', 'section', 'day', 'period', 
-            'subject', 'teacher', 'period_detail', 'subject_name', 
-            'subject_code', 'teacher_name'
+            'id', 'school_class', 'section', 'day', 'period',
+            'subject', 'teacher', 'period_detail', 'subject_name',
+            'subject_code', 'teacher_name', 'class_name', 'section_name',
         ]
 
     def get_teacher_name(self, obj):
@@ -35,9 +39,10 @@ class ClassRoutineSerializer(serializers.ModelSerializer):
         instance = ClassRoutine(**data)
         if self.instance:
             instance.id = self.instance.id
-            
+
         try:
             instance.clean()
         except ValidationError as e:
-            raise serializers.ValidationError(e.message if hasattr(e, 'message') else str(e))
+            raise serializers.ValidationError(
+                e.message if hasattr(e, 'message') else str(e))
         return data

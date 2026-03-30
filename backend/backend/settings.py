@@ -139,9 +139,9 @@ STATIC_URL = 'static/'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # Vite React dev server
-    "http://192.168.0.105:19000",  # Expo LAN (check expo start QR/terminal)
-    "http://192.168.0.105:8081",   # Expo Metro bundler
-    "exp://192.168.0.105:19000",   # Expo scheme (no http)
+    "http://192.168.0.108:19000",  # Expo LAN (check expo start QR/terminal)
+    "http://192.168.0.108:8081",   # Expo Metro bundler
+    "exp://192.168.0.108:19000",   # Expo scheme (no http)
     # Add "*" temporarily for dev: but insecure
 ]
 

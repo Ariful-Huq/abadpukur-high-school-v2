@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from academics.models import Class, Section, Subject
 from teachers.models import Teacher
 
+
 class Period(models.Model):
     name = models.CharField(max_length=50)
     start_time = models.TimeField()
@@ -11,6 +12,7 @@ class Period(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class ClassRoutine(models.Model):
     DAY_CHOICES = (
@@ -52,11 +54,15 @@ class ClassRoutine(models.Model):
         ).exclude(id=self.id)
 
         if slot_conflict.exists():
-            raise ValidationError("This class slot is already occupied by another subject.")
+            raise ValidationError(
+                "This class slot is already occupied by another subject.")
 
     def save(self, *args, **kwargs):
-        self.full_clean() # Triggers the clean method
+        self.full_clean()  # Triggers the clean method
         super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.school_class}-{self.section} {self.day} {self.period}"
+
+    class Meta:
+        ordering = ['school_class', 'section', 'day', 'period']  # ← ADD THIS

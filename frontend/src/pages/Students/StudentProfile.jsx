@@ -1,3 +1,4 @@
+// abadpukur-high-school/frontend/src/pages/Students/StudentProfile.jsx
 import { useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { getStudent, deleteStudent } from "../../api/studentsApi";

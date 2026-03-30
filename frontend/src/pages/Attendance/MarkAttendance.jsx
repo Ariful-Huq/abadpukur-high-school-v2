@@ -8,7 +8,7 @@ import { CheckCircle, XCircle, Clock, DoorOpen, Coffee, Save, Search } from "luc
 export default function MarkAttendance() {
   const [classes, setClasses] = useState([]);
   const [sections, setSections] = useState([]);
-  const [filters, setFilters] = useState({ class_id: "", section_id: "", date: new Date().toISOString().split('T')[0] });
+  const [filters, setFilters] = useState({ class_id: "", section_id: "", date: new Date().toLocaleDateString('en-CA') });
   const [students, setStudents] = useState([]);
   const [attendance, setAttendance] = useState({});
 

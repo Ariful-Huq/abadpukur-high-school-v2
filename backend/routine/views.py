@@ -18,6 +18,6 @@ class ClassRoutineViewSet(viewsets.ModelViewSet):
 
     # 1. Add Filter Backends
     filter_backends = [DjangoFilterBackend]
-    
+
     # 2. Define the fields React can filter by
-    filterset_fields = ['school_class', 'section']
+    filterset_fields = ['school_class', 'section', 'teacher', 'period']
