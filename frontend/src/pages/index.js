@@ -22,6 +22,11 @@ export { default as TeacherForm } from "./Teachers/TeacherForm";
 export { default as MarkAttendance } from "./Attendance/MarkAttendance";
 export { default as MonthlyAttendance } from "./Attendance/MonthlyAttendance";
 
+// Results
+export { default as MarkEntry } from "./Results/MarkEntry";
+export { default as ExamSetup } from "./Results/ExamSetup";
+export { default as TermReports } from "./Results/TermReports";
+
 // Routine
 export { default as RoutineTable } from "./Routine/RoutineTable";
 export { default as Periods } from "./Routine/Periods";

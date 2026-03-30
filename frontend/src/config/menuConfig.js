@@ -15,6 +15,9 @@ import {
   CalendarDays,
   Settings,
   AlertCircle,
+  GraduationCap,
+  FileSpreadsheet,
+  Award
 } from "lucide-react";
 
 export const menuItems = [
@@ -64,6 +67,17 @@ export const menuItems = [
     children: [
       { name: "Mark Attendance", path: "/attendance/mark", icon: UserCheck }, // Daily Marking
       { name: "Monthly Report", path: "/attendance/monthly", icon: Calendar }, // The Grid
+    ],
+  },
+
+  {
+    name: "Results",
+    icon: GraduationCap,
+    roles: ["admin", "teacher"], // Teachers can enter marks
+    children: [
+      { name: "Mark Entry", path: "/results/mark-entry", icon: FileSpreadsheet },
+      { name: "Exam Setup", path: "/results/setup", icon: Settings },
+      { name: "Term Reports", path: "/results/reports", icon: Award },
     ],
   },
 

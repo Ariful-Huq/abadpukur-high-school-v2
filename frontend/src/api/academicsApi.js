@@ -1,3 +1,4 @@
+// frontend/src/api/academicsApi.js
 import axios from "./axios";
 
 export const getClasses = () => axios.get("academics/classes/");

@@ -5,6 +5,7 @@ from .models import Student, Enrollment
 
 class StudentSerializer(serializers.ModelSerializer):
     # SerializerMethodField allows us to run a small function to find related data
+    enrollment_id = serializers.SerializerMethodField()
     class_name = serializers.SerializerMethodField()
     section_name = serializers.SerializerMethodField()
     session_name = serializers.SerializerMethodField()
@@ -12,9 +13,14 @@ class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
         fields = [
-            'id', 'first_name', 'last_name', 'roll_number',
+            'id', 'enrollment_id', 'first_name', 'last_name', 'roll_number',
             'photo', 'class_name', 'section_name', 'session_name'
         ]
+
+    def get_enrollment_id(self, obj):
+        # Retrieve the ID of the enrollment record for this student
+        enrollment = obj.enrollment_set.first()
+        return enrollment.id if enrollment else None
 
     def get_class_name(self, obj):
         # We look into the Enrollment table for this student

@@ -116,7 +116,7 @@ function AttendanceChart({ title, data, primaryColor, secondaryColor }) {
       <h3 className="text-lg font-bold text-gray-800 mb-6">{title}</h3>
       <div className="flex-1 w-full" style={{ minWidth: 0 }}>
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data || []} margin={{ top: 0, right: 10, left: -20, bottom: 0 }}>
+          <BarChart data={data}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
             <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#9ca3af', fontSize: 10, fontWeight: 500}} />
             <YAxis domain={[0, 100]} axisLine={false} tickLine={false} tick={{fill: '#9ca3af', fontSize: 11}} />
