@@ -16,3 +16,11 @@ export const getMarks = (examId, subjectId, classId, sectionId) => {
 
 // Send the bulk marks list to the backend
 export const submitBulkMarks = (data) => api.post("results/marks/bulk-entry/", data);
+
+export const getStudentReport = (enrollmentId, examId) => {
+  return api.get(`results/marks/student-report/?enrollment_id=${enrollmentId}&exam_id=${examId}`);
+};
+
+export const getTabulationSheet = (classId, sectionId, examId) => {
+  return api.get(`results/marks/tabulation-sheet/?class_id=${classId}&section_id=${sectionId}&exam_id=${examId}`);
+};

@@ -24,6 +24,7 @@ export { default as MonthlyAttendance } from "./Attendance/MonthlyAttendance";
 
 // Results
 export { default as MarkEntry } from "./Results/MarkEntry";
+export { default as TabulationSheet} from "./Results/TabulationSheet";
 export { default as ExamSetup } from "./Results/ExamSetup";
 export { default as TermReports } from "./Results/TermReports";
 

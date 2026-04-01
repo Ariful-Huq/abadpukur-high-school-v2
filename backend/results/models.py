@@ -14,6 +14,10 @@ class Exam(models.Model):
     # Reference the session from academics to keep track of the year
     session = models.ForeignKey(
         'academics.AcademicSession', on_delete=models.CASCADE)
+
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
@@ -34,6 +38,25 @@ class Mark(models.Model):
     class Meta:
         # A student can only have ONE mark record for a specific subject in a specific exam
         unique_together = ('enrollment', 'subject', 'exam')
+
+    def get_grade(self):
+        # If no marks have been entered at all, return N/A or empty
+        if self.total_marks == 0 and self.written_marks == 0:
+            return "-"
+
+        if self.total_marks >= 80:
+            return "A+"
+        if self.total_marks >= 70:
+            return "A"
+        if self.total_marks >= 60:
+            return "A-"
+        if self.total_marks >= 50:
+            return "B"
+        if self.total_marks >= 40:
+            return "C"
+        if self.total_marks >= 33:
+            return "D"
+        return "F"
 
     def save(self, *args, **kwargs):
         self.total_marks = self.written_marks + \

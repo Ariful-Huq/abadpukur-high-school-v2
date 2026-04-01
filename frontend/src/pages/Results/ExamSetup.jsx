@@ -8,7 +8,13 @@ import { Plus, Trash2, CalendarCheck, AlertCircle } from "lucide-react";
 export default function ExamSetup() {
   const [exams, setExams] = useState([]);
   const [sessions, setSessions] = useState([]);
-  const [formData, setFormData] = useState({ name: "1st Term", session: "", is_active: true });
+  const [formData, setFormData] = useState({
+    name: "1st Term",
+    session: "",
+    start_date: "", 
+    end_date: "",
+    is_active: true
+  });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -40,6 +46,13 @@ export default function ExamSetup() {
     try {
       await createExam(formData);
       fetchData(); // Refresh list
+      // Reset form (keeping session selected for convenience)
+      setFormData(prev => ({ 
+        ...prev, 
+        name: "1st Term", // Reset to default term
+        start_date: "", 
+        end_date: "" 
+      }));
       alert("Exam term created successfully!");
     } catch (err) {
       alert("Error: Likely this term already exists for this session.");
@@ -84,6 +97,31 @@ export default function ExamSetup() {
                 </select>
               </div>
 
+              {/* Start Date Input */}
+              <div>
+                <label className="text-xs font-bold text-gray-400 uppercase">Start Date</label>
+                <input 
+                  type="date"
+                  className="w-full border rounded-lg p-2 mt-1"
+                  value={formData.start_date}
+                  onChange={e => setFormData({...formData, start_date: e.target.value})}
+                  required
+                />
+              </div>
+
+              {/* End Date Input */}
+              <div>
+                <label className="text-xs font-bold text-gray-400 uppercase">End Date</label>
+                <input 
+                  type="date"
+                  className="w-full border rounded-lg p-2 mt-1"
+                  value={formData.end_date}
+                  onChange={e => setFormData({...formData, end_date: e.target.value})}
+                  required
+                />
+              </div>
+
+              {/* Session Select */}
               <div>
                 <label className="text-xs font-bold text-gray-400 uppercase">Academic Session</label>
                 <select 
@@ -122,6 +160,9 @@ export default function ExamSetup() {
                 <div key={exam.id} className="bg-white p-4 rounded-xl shadow-sm border flex justify-between items-center">
                   <div>
                     <h3 className="font-bold text-gray-800">{exam.name}</h3>
+                    <p className="text-xs text-gray-500 font-medium">
+                    {exam.start_date} to {exam.end_date}
+                    </p>
                     <p className="text-sm text-gray-500 font-mono">ID: {exam.id}</p>
                   </div>
                   <button 

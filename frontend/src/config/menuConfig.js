@@ -78,6 +78,7 @@ export const menuItems = [
       { name: "Mark Entry", path: "/results/mark-entry", icon: FileSpreadsheet },
       { name: "Exam Setup", path: "/results/setup", icon: Settings },
       { name: "Term Reports", path: "/results/reports", icon: Award },
+      { name: "Tabulation Sheet", path: "/results/tabulation" },
     ],
   },
 
