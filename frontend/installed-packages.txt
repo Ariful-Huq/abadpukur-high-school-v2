@@ -1,0 +1,26 @@
+frontend@0.0.0 D:\abadpukur-high-school\frontend
+Γö£ΓöÇΓöÇ @eslint/js@9.39.4
+Γö£ΓöÇΓöÇ @tailwindcss/postcss@4.2.1
+Γö£ΓöÇΓöÇ @tailwindcss/vite@4.2.1
+Γö£ΓöÇΓöÇ @types/react-dom@19.2.3
+Γö£ΓöÇΓöÇ @types/react@19.2.14
+Γö£ΓöÇΓöÇ @vitejs/plugin-react@5.1.4
+Γö£ΓöÇΓöÇ axios@1.13.6
+Γö£ΓöÇΓöÇ date-fns@4.1.0
+Γö£ΓöÇΓöÇ eslint-plugin-react-hooks@7.0.1
+Γö£ΓöÇΓöÇ eslint-plugin-react-refresh@0.4.26
+Γö£ΓöÇΓöÇ eslint@9.39.4
+Γö£ΓöÇΓöÇ exceljs@4.4.0
+Γö£ΓöÇΓöÇ globals@16.5.0
+Γö£ΓöÇΓöÇ jspdf-autotable@5.0.7
+Γö£ΓöÇΓöÇ jspdf@4.2.1
+Γö£ΓöÇΓöÇ jwt-decode@4.0.0
+Γö£ΓöÇΓöÇ lucide-react@0.577.0
+Γö£ΓöÇΓöÇ react-dom@19.2.4
+Γö£ΓöÇΓöÇ react-router-dom@7.13.1
+Γö£ΓöÇΓöÇ react@19.2.4
+Γö£ΓöÇΓöÇ recharts@3.8.1
+Γö£ΓöÇΓöÇ tailwindcss@4.2.1
+Γö£ΓöÇΓöÇ vite@7.3.1
+ΓööΓöÇΓöÇ xlsx@0.18.5
+

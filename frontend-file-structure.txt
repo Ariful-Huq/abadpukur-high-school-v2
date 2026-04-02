@@ -1,130 +1,84 @@
 D:\ABADPUKUR-HIGH-SCHOOL\FRONTEND
 │ 
-├───public
-├───src
-│   ├───api
-│   │   └───axios.js
-│   ├───auth
-│   │   ├───Login.jsx
-│   │   └───ProtectedRoute.jsx
-│   ├───components
-│   │   ├───layout
-│   │   │   ├───DashboardLayout.jsx
-│   │   │   ├───Header.jsx
-│   │   │   └───Sidebar.jsx
-│   │   └───ui
-│   ├───context
-│   │   └───AuthContext.jsx
-│   ├───hooks
-│   ├───modules
-│   │   ├───academics
-│   │   │   └───pages
-│   │   ├───attendance
-│   │   │   └───pages
-│   │   ├───fees
-│   │   │   └───pages
-│   │   ├───students
-│   │   │   └───pages
-│   │   └───teachers
-│   │       └───pages
-│   ├───router
-│   │   └───AppRouter.jsx
-│   ├───styles
-│   ├───utils
-│   ├───App.jsx
-│   ├───index.css
-│   └───main.jsx
-├───index.html
-├───package.json
-├───tailwind.config.js
-└───vite.config.js
-
-
-
-frontend/
-│
-├── public/
-│	└──AbadpukurSchoolLogo.svg
-│
-├── src/
-│   ├── api/
-│   │   ├── axios.js
+├── public
+│   ├── abadpukur-high-school-logo.svg
+│   └── logo.png
+├── src
+│   ├── api
 │   │   ├── academicsApi.js
-│   │   ├── studentsApi.js
-│   │   ├── teachersApi.js
 │   │   ├── attendanceApi.js
-│   │   ├── routineApi.js
+│   │   ├── authApi.js
+│   │   ├── axios.js
+│   │   ├── dashboardApi.js
 │   │   ├── feesApi.js
-│   │   └── dashboardApi.js
-│	│
-│   ├── components/
-│   │   ├── layout/
-│   │   │   ├──AppLayout.jsx
-│   │   │   ├── Topbar.jsx
+│   │   ├── resultsApi.js
+│   │   ├── routineApi.js
+│   │   ├── studentsApi.js
+│   │   └── teachersApi.js
+│   ├── components
+│   │   ├── layout
+│   │   │   ├── AppLayout.jsx
 │   │   │   ├── Sidebar.jsx
-│   │   │   └── Layout.jsx
-│   │   ├──ProtectedRoute.jsx
-│   │	│
-│   │   └── ui/
-│   │       ├── Card.jsx
-│   │       ├── Table.jsx
-│   │       ├── Button.jsx
-│   │       └── Modal.jsx
-│   ├──config
-│   │   └──menuConfig.js
-│	│
-│   ├── pages/
-│   │   ├───Auth
-│   │   │   └──Login.jsx
-│   │	│
-│   │   ├── Dashboard/
-│   │   │   └── Dashboard.jsx
-│   │	│
-│   │   ├── Academics/
+│   │   │   └── Topbar.jsx
+│   │   ├── ui
+│   │   │   ├── Button.jsx
+│   │   │   ├── Card.jsx
+│   │   │   ├── Modal.jsx
+│   │   │   └── Table.jsx
+│   │   └── ProtectedRoute.jsx
+│   ├── config
+│   │   └── menuConfig.js
+│   ├── context
+│   │   └── AuthContext.jsx
+│   ├── hooks
+│   │   └── useFetch.js
+│   ├── pages
+│   │   ├── Academics
+│   │   │   ├── AcademicSessions.jsx
 │   │   │   ├── Classes.jsx
 │   │   │   ├── Sections.jsx
-│   │   │   ├── Subjects.jsx
-│   │   │   └── AcademicSessions.jsx
-│   │	│
-│   │   ├── Students/
-│   │   │   ├── StudentsList.jsx
-│   │   │   └── StudentForm.jsx
-│   │	│
-│   │   ├── Teachers/
-│   │   │   ├── TeachersForm.jsx
-│   │   │   └── TeachersList.jsx
-│   │	│
-│   │   ├── Routine/
-│   │   │   └── RoutineTable.jsx
-│   │	│
-│   │   ├── Attendance/
+│   │   │   └── Subjects.jsx
+│   │   ├── Attendance
+│   │   │   ├── MarkAttendance.jsx
 │   │   │   └── MonthlyAttendance.jsx
-│   │	│
-│   │   ├── Fees/
+│   │   ├── Auth
+│   │   │   └── Login.jsx
+│   │   ├── Dashboard
+│   │   │   └── Dashboard.jsx
+│   │   ├── Fees
+│   │   │   ├── DefaulterList.jsx
+│   │   │   ├── FeeStructures.jsx
 │   │   │   └── Payments.jsx
-│   │	│
-│   │   ├── Settings/
-│   │   │   └── SchoolSettings.jsx
-│   │	│
-│   │   └──index.js
-│	│
-│   ├── routes/
-│   │   └── AppRoutes.jsx
-│	│
-│   ├── hooks/
-│   │   └── useFetch.js
-│	│
-│   ├── context/
-│   │   └── AuthContext.jsx
-│	│
-│   ├── utils/
+│   │   ├── Logs
+│   │   │   └── LogManagement.jsx
+│   │   ├── Results
+│   │   │   ├── ExamSetup.jsx
+│   │   │   ├── MarkEntry.jsx
+│   │   │   ├── TabulationSheet.jsx
+│   │   │   └── TermReports.jsx
+│   │   ├── Routine
+│   │   │   ├── Periods.jsx
+│   │   │   └── RoutineTable.jsx
+│   │   ├── Students
+│   │   │   ├── StudentForm.jsx
+│   │   │   ├── StudentProfile.jsx
+│   │   │   └── StudentsList.jsx
+│   │   ├── Teachers
+│   │   │   ├── TeacherForm.jsx
+│   │   │   ├── TeacherProfile.jsx
+│   │   │   └── TeachersList.jsx
+│   │   ├── Users
+│   │   │   └── UserManagement.jsx
+│   │   └── index.js
+│   ├── routes
+│   │   └── AppRouter.jsx
+│   ├── utils
 │   │   └── constants.js
-│	│
 │   ├── App.jsx
 │   ├── index.css
 │   └── main.jsx
-│
-├───index.html
-├───package.json
-├───tailwind.config.js
-└───vite.config.js
+├── eslint.config.js
+├── index.html
+├── package.json
+├── tailwind.config.js
+└── vite.config.js
