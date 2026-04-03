@@ -1,4 +1,4 @@
-d://abadpukur-high-school/backend/
+d:/abadpukur-high-school/backend/
 │
 ├── academics/                   # Academic structure
 │   ├── __init__.py

@@ -1,3 +1,4 @@
+// frontend/src/pages/Teachers/TeacherProfile.jsx
 import { useEffect, useState } from "react";
 import { getTeachers, deleteTeacher } from "../../api/teachersApi";
 import { Link } from "react-router-dom";

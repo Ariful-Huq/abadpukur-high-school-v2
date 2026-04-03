@@ -1,4 +1,4 @@
-// src/routes/AppRoutes.jsx
+// frontend/src/routes/AppRoutes.jsx
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
@@ -87,9 +87,13 @@ export default function AppRoutes() {
         {/* Generate dynamic routes based on role */}
         {generateRoutes(menuItems)}
 
-        {/* Dynamic Detail Routes - Always include these but ProtectedRoute handles role check */}
+        {/* Student Detail Routes - Always include these but ProtectedRoute handles role check */}
         <Route path="/students/:id" element={<Pages.StudentProfile />} />
         <Route path="/students/:id/edit" element={<Pages.StudentForm />} />
+
+        {/* Teacher Detail Routes - Always include these but ProtectedRoute handles role check */}
+        <Route path="/teachers/:id" element={<Pages.TeacherProfile />} />
+        <Route path="/teachers/:id/edit" element={<Pages.TeacherForm />} />
         
         {/* Root Redirect to Dashboard */}
         <Route path="/" element={<Pages.Dashboard />} />

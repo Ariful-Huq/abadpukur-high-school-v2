@@ -1,3 +1,4 @@
+// frontend/src/api/teachersApi.js
 import axios from "./axios";
 
 // Removed the leading "/" from all paths

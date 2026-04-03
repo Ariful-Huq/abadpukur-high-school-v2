@@ -17,6 +17,7 @@ export { default as StudentProfile } from "./Students/StudentProfile";
 // Teachers
 export { default as TeachersList } from "./Teachers/TeachersList";
 export { default as TeacherForm } from "./Teachers/TeacherForm";
+export { default as TeacherProfile } from "./Teachers/TeacherProfile";
 
 // Attendance
 export { default as MarkAttendance } from "./Attendance/MarkAttendance";

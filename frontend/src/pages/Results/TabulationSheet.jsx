@@ -55,7 +55,7 @@ export default function TabulationSheet() {
     if (!sheet) return;
 
     // Prepare Header Row
-    const headers = ["Roll", "Student Name", ...sheet.subjects.map(s => s.name), "Grand Total", "Attendance %"];
+    const headers = ["Roll", "Student Name", ...sheet.subjects.map(s => s.name), "Grand Total", "Attendance %", "Rank"];
     
     // Prepare Data Rows
     const rows = sheet.students.map(stu => [
@@ -63,13 +63,14 @@ export default function TabulationSheet() {
       stu.name,
       ...stu.marks.map(m => `${m.total} (${m.grade})`),
       stu.grand_total,
-      `${stu.attendance_pc}%`
+      `${stu.attendance_pc}%`,
+      stu.rank
     ]);
 
     const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Tabulation_Sheet");
-    
+        
     // Generate file name based on filters
     const fileName = `Tabulation_${filters.class_id}_${filters.section_id}.xlsx`;
     XLSX.writeFile(workbook, fileName);
@@ -167,6 +168,7 @@ export default function TabulationSheet() {
                     ))}
                     <th className="p-3 border border-gray-700 bg-purple-900 text-center">Total</th>
                     <th className="p-3 border border-gray-700 bg-blue-900 text-center uppercase">Attn %</th>
+                    <th className="p-3 border border-gray-700 bg-amber-600 uppercase">Rank</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -185,6 +187,9 @@ export default function TabulationSheet() {
                       </td>
                       <td className="p-3 border text-center font-bold bg-blue-50 text-blue-700">
                         {stu.attendance_pc}%
+                      </td>
+                      <td className="p-3 border text-center font-black bg-amber-50 text-amber-700">
+                        {stu.rank}
                       </td>
                     </tr>
                   ))}

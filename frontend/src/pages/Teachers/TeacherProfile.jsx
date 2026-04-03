@@ -1,3 +1,4 @@
+// frontend/src/pages/Teachers/TeacherProfile.jsx
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getTeacher } from "../../api/teachersApi";

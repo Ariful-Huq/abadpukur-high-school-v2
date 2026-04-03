@@ -14,6 +14,8 @@ from attendance.models import Attendance
 class MarkViewSet(viewsets.ModelViewSet):
     queryset = Mark.objects.all()
     serializer_class = MarkSerializer
+    filterset_fields = ['exam', 'subject',
+                        'enrollment__school_class', 'enrollment__section']
 
     @action(detail=False, methods=['post'], url_path='bulk-entry')
     def bulk_entry(self, request):
@@ -161,6 +163,21 @@ class MarkViewSet(viewsets.ModelViewSet):
 
             student_row["grand_total"] = total_score
             sheet_data.append(student_row)
+
+        # 6. Sort and Assign Rank
+        # Sort a temporary list to determine rank
+        ranked_list = sorted(
+            sheet_data,
+            key=lambda x: (x['grand_total'], x['attendance_pc']),
+            reverse=True
+        )
+
+        # Assign rank based on sorted position
+        for index, ranked_item in enumerate(ranked_list):
+            for student in sheet_data:
+                if student['roll'] == ranked_item['roll']:
+                    student['rank'] = index + 1
+                    break
 
         return Response({
             "subjects": subject_list,

@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { getClasses, getSections, getSubjects } from "../../api/academicsApi";
 import { getStudents } from "../../api/studentsApi";
-import { getExams, submitBulkMarks } from "../../api/resultsApi";
+import { getExams, submitBulkMarks, getMarks } from "../../api/resultsApi";
 import { Save, Search, ClipboardList } from "lucide-react";
 
 export default function MarkEntry() {
@@ -37,25 +37,46 @@ export default function MarkEntry() {
     const { class_id, section_id, subject_id, exam_id } = filters;
 
     if (!class_id || !section_id || !subject_id || !exam_id) {
-      return alert("Please select all filters: Class, Section, Subject, and Exam");
+      return alert("Please select all filters.");
     }
 
     try {
-      const res = await getStudents(class_id, section_id);
-      const list = res.data.results || res.data || [];
-      
-      if (list.length === 0) {
-        alert("No students found for this class/section.");
-      }
-      setStudents(list);
+      // 1. Fetch Students
+      const studentRes = await getStudents(class_id, section_id);
+      const studentList = studentRes.data.results || studentRes.data || [];
+      setStudents(studentList);
 
-      const initialMarks = {};
-      list.forEach((s) => {
-        initialMarks[s.id] = { written: 0, objective: 0, practical: 0 };
+      // 2. Fetch Existing Marks for this specific context
+      const marksRes = await getMarks(exam_id, subject_id, class_id, section_id);
+      const existingMarksList = marksRes.data.results || marksRes.data || [];
+
+      // 3. Initialize state with 0s first
+      const mergedMarks = {};
+      studentList.forEach((s) => {
+        mergedMarks[s.id] = { written: 0, objective: 0, practical: 0 };
       });
-      setMarks(initialMarks);
+
+      // 4. Overwrite with actual saved marks from database
+      existingMarksList.forEach((m) => {
+        if (String(m.subject) === String(filters.subject_id)) {
+          // Find the student in our current list that matches this mark's enrollment
+          const student = studentList.find(s => s.enrollment_id === m.enrollment);
+          if (student) {
+            mergedMarks[student.id] = {
+              written: m.written_marks || 0,
+              objective: m.objective_marks || 0,
+              practical: m.practical_marks || 0,
+            };
+          }
+        }
+      });
+
+      setMarks(mergedMarks);
+      
+      if (studentList.length === 0) alert("No students found.");
     } catch (err) {
-      alert("Failed to load students."); 
+      console.error(err);
+      alert("Failed to load data.");
     }
   };
 
@@ -111,7 +132,11 @@ export default function MarkEntry() {
             <select 
               className="w-full border rounded-lg p-2 mt-1" 
               value={filters.exam_id}
-              onChange={e => setFilters({...filters, exam_id: e.target.value})}
+              onChange={e => {
+                setFilters({...filters, exam_id: e.target.value});
+                setStudents([]);
+                setMarks({});
+              }}
             >
               <option value="">Select Exam</option>
               {data.exams.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
@@ -124,12 +149,16 @@ export default function MarkEntry() {
             <select 
               className="w-full border rounded-lg p-2 mt-1"
               value={filters.class_id}
-              onChange={e => setFilters({
-                ...filters,
-                class_id: e.target.value,
-                section_id: "", // Clear dependent dropdowns
-                subject_id: ""
-              })}
+              onChange={e => {
+                setFilters({
+                  ...filters,
+                  class_id: e.target.value,
+                  section_id: "", // Clear dependent dropdowns
+                  subject_id: ""
+                });
+                setStudents([]);
+                setMarks({});
+              }}
             >
               <option value="">Select Class</option>
               {data.classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -142,7 +171,11 @@ export default function MarkEntry() {
             <select 
               className="w-full border rounded-lg p-2 mt-1"
               value={filters.section_id}
-              onChange={e => setFilters({...filters, section_id: e.target.value})}
+              onChange={e => {
+                setFilters({...filters, section_id: e.target.value});
+                setStudents([]);
+                setMarks({});
+              }}
               disabled={!filters.class_id}
             >
               <option value="">Select Section</option>
@@ -156,7 +189,11 @@ export default function MarkEntry() {
             <select
               className="w-full border rounded-lg p-2 mt-1"
               value={filters.subject_id}
-              onChange={e => setFilters({...filters, subject_id: e.target.value})}
+              onChange={e => {
+                setFilters({...filters, subject_id: e.target.value});
+                setStudents([]);
+                setMarks({});
+              }}
               disabled={!filters.class_id}
             >
               <option value="">Select Subject</option>
@@ -193,17 +230,17 @@ export default function MarkEntry() {
                     <td className="p-4 font-semibold">{s.first_name} {s.last_name}</td>
                     <td className="p-4">
                       <input type="number" className="w-24 border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none" 
-                        placeholder="0"
+                        value={marks[s.id]?.written || ""}
                         onChange={e => handleMarkChange(s.id, 'written', e.target.value)} />
                     </td>
                     <td className="p-4">
                       <input type="number" className="w-24 border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none" 
-                        placeholder="0"
+                        value={marks[s.id]?.objective || ""}
                         onChange={e => handleMarkChange(s.id, 'objective', e.target.value)} />
                     </td>
                     <td className="p-4">
                       <input type="number" className="w-24 border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none" 
-                        placeholder="0"
+                        value={marks[s.id]?.practical || ""}
                         onChange={e => handleMarkChange(s.id, 'practical', e.target.value)} />
                     </td>
                     <td className="p-4 font-bold text-lg text-blue-600">
