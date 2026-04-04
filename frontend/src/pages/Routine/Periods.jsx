@@ -1,3 +1,4 @@
+// frontend/src/pages/Routine/Periods.jsx
 import { useState, useEffect } from "react";
 import { getPeriods, createPeriod, deletePeriod } from "../../api/routineApi";
 import { Clock, Plus, Trash2, ArrowLeft } from "lucide-react";

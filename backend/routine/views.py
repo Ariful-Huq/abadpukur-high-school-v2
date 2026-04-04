@@ -12,9 +12,11 @@ class PeriodViewSet(viewsets.ModelViewSet):
 
 
 class ClassRoutineViewSet(viewsets.ModelViewSet):
-
-    queryset = ClassRoutine.objects.all()
+    # Order by day and period to keep data consistent
+    queryset = ClassRoutine.objects.all().order_by('day', 'period')
     serializer_class = ClassRoutineSerializer
+    # ADD THIS LINE TO DISABLE PAGINATION
+    pagination_class = None
 
     # 1. Add Filter Backends
     filter_backends = [DjangoFilterBackend]
