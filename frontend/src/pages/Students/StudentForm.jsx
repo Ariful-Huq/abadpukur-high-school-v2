@@ -1,8 +1,9 @@
+// frontend/src/pages/Students/StudentForm.jsx
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { createStudent, getStudent, updateStudent } from "../../api/studentsApi";
+import { createStudent, getStudent, updateStudent, getNextRollNumber } from "../../api/studentsApi";
 import { getClasses, getSections, getSessions } from "../../api/academicsApi";
-import { UserPlus, Upload, Image as ImageIcon, Save, ArrowLeft } from "lucide-react";
+import { UserPlus, Upload, Image as ImageIcon, Save, ArrowLeft, Phone, User as UserIcon, MapPin } from "lucide-react";
 
 export default function StudentForm() {
   const { id } = useParams();
@@ -13,57 +14,58 @@ export default function StudentForm() {
   const [sections, setSections] = useState([]);
   const [sessions, setSessions] = useState([]);
   const [preview, setPreview] = useState(null);
-  const [loading, setLoading] = useState(isEditMode);
+  const [loading, setLoading] = useState(true);
 
   const [form, setForm] = useState({
-    first_name: "",
-    last_name: "",
-    roll_number: "",
-    class_id: "",
-    section_id: "",
-    session_id: "",
+    first_name: "", last_name: "", roll_number: "",
+    class_id: "", section_id: "", session_id: "",
+    father_name: "", father_contact: "",
+    mother_name: "", mother_contact: "",
+    date_of_birth: "", religion: "", address: "",
     photo: null,
   });
 
+  // Load Initial Data
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [cls, sec, ses] = await Promise.all([
-          getClasses(),
-          getSections(),
-          getSessions(),
-        ]);
+        const [cls, sec, ses] = await Promise.all([getClasses(), getSections(), getSessions()]);
+        
+        const classesData = cls.data.results || cls.data || [];
+        const sectionsData = sec.data.results || sec.data || [];
+        const sessionsData = ses.data.results || ses.data || [];
 
-        const classesData = cls.data.results || cls.data;
-        const sectionsData = sec.data.results || sec.data;
-        const sessionsData = ses.data.results || ses.data;
+        setClasses(classesData);
+        setSections(sectionsData);
+        setSessions(sessionsData);
 
-        setClasses(Array.isArray(classesData) ? classesData : []);
-        setSections(Array.isArray(sectionsData) ? sectionsData : []);
-        setSessions(Array.isArray(sessionsData) ? sessionsData : []);
-
-        // If Editing: Fetch existing student data
         if (isEditMode) {
-          const studentRes = await getStudent(id);
-          const s = studentRes.data;
+          const res = await getStudent(id);
+          const s = res.data;
           
+          // CRITICAL: Map the incoming data to the specific ID fields for the dropdowns
           setForm({
             first_name: s.first_name || "",
             last_name: s.last_name || "",
             roll_number: s.roll_number || "",
-            // Use existing enrollment IDs if they exist in your serializer
-            class_id: s.school_class || "", 
-            section_id: s.section || "",
-            session_id: s.session || "",
-            photo: null, // Reset to null so we don't re-upload the same file as a string
+            class_id: s.class_id || "",
+            section_id: s.section_id || "",
+            session_id: s.session_id || "",
+            father_name: s.father_name || "",
+            father_contact: s.father_contact || "",
+            mother_name: s.mother_name || "",
+            mother_contact: s.mother_contact || "",
+            date_of_birth: s.date_of_birth || "",
+            religion: s.religion || "",
+            address: s.address || "",
+            photo: null, // Keep null unless user uploads a new one
           });
+
           if (s.photo) setPreview(s.photo);
         } else {
-          // If Creating: Set default active session
-          const activeSession = sessionsData.find(s => s.is_active);
-          if (activeSession) {
-            setForm(prev => ({ ...prev, session_id: activeSession.id }));
-          }
+          // Default to active session for new admissions
+          const active = sessionsData.find(s => s.is_active);
+          if (active) setForm(prev => ({ ...prev, session_id: active.id }));
         }
       } catch (err) {
         console.error("Error loading form data:", err);
@@ -73,6 +75,15 @@ export default function StudentForm() {
     };
     loadData();
   }, [id, isEditMode]);
+
+  // AUTO-POPULATE ROLL NUMBER (Only for new students)
+  useEffect(() => {
+    if (!isEditMode && form.class_id && form.section_id) {
+      getNextRollNumber(form.class_id, form.section_id).then(res => {
+        setForm(prev => ({ ...prev, roll_number: res.data.next_roll }));
+      });
+    }
+  }, [form.class_id, form.section_id, isEditMode]);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -89,16 +100,15 @@ export default function StudentForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     const formData = new FormData();
-    // Append all form fields to FormData
-    Object.keys(form).forEach((key) => {
-      // Only append photo if a new file was selected
+    
+    Object.keys(form).forEach(key => {
+      // Only append photo if it's a new file upload
       if (key === "photo") {
-        if (form[key] instanceof File) {
-          formData.append(key, form[key]);
-        }
-      } else if (form[key] !== null && form[key] !== "") {
+        if (form[key] instanceof File) formData.append(key, form[key]);
+      } 
+      // Append other fields if they aren't null
+      else if (form[key] !== null && form[key] !== undefined) {
         formData.append(key, form[key]);
       }
     });
@@ -111,136 +121,151 @@ export default function StudentForm() {
       }
       navigate("/students");
     } catch (err) {
-      console.error("Save error:", err);
-      alert("Error saving record. Check if Roll Number is unique.");
+      console.error(err);
+      alert("Error saving student record. Please check if the roll number is unique.");
     }
   };
 
-  if (loading) return <div className="p-10 text-center animate-pulse">Loading form data...</div>;
+  if (loading) return <div className="p-10 text-center animate-pulse text-gray-500">Loading form data...</div>;
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
-      <div className="max-w-3xl mx-auto">
-        <button 
-          onClick={() => navigate(-1)} 
-          className="flex items-center gap-2 text-gray-500 hover:text-blue-600 mb-6 transition-colors"
-        >
+      <div className="max-w-4xl mx-auto">
+        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-gray-500 mb-6 hover:text-blue-600 transition-colors">
           <ArrowLeft size={18} /> Cancel & Go Back
         </button>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border overflow-hidden">
           <div className={`${isEditMode ? 'bg-indigo-600' : 'bg-blue-600'} p-6 text-white text-center`}>
-            {isEditMode ? <Save className="mx-auto mb-2" size={32} /> : <UserPlus className="mx-auto mb-2" size={32} />}
-            <h1 className="text-2xl font-bold">{isEditMode ? "Update Student Profile" : "Student Admission"}</h1>
-            <p className="text-white/80">{isEditMode ? `Editing ID: #${id}` : "Enter student details to enroll"}</p>
+            <h1 className="text-2xl font-bold">{isEditMode ? "Edit Student Profile" : "New Student Admission"}</h1>
+            <p className="text-blue-100 text-sm mt-1">
+              {isEditMode ? `Updating records for Student ID: #${id}` : "Enter details for the new academic enrollment"}
+            </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-8 space-y-6">
-            {/* Photo Upload Section */}
-            <div className="flex flex-col items-center mb-6">
-              <div className="w-32 h-32 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden bg-gray-50 relative group">
-                {preview ? (
-                  <img src={preview} alt="Preview" className="w-full h-full object-cover" />
-                ) : (
-                  <ImageIcon className="text-gray-300" size={40} />
-                )}
-                <label className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+          <div className="p-8 space-y-8">
+            {/* 1. Profile Photo */}
+            <div className="flex flex-col items-center">
+              <div className="w-28 h-28 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden bg-gray-50 relative group">
+                {preview ? <img src={preview} className="w-full h-full object-cover" alt="Preview" /> : <ImageIcon className="text-gray-300" size={32} />}
+                <label className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity">
                   <Upload className="text-white" size={20} />
                   <input type="file" name="photo" className="hidden" onChange={handleChange} accept="image/*" />
                 </label>
               </div>
-              <p className="text-xs text-gray-500 mt-2 font-medium">
-                {isEditMode ? "Click to change photo" : "Click to upload photo"}
-              </p>
+              <p className="text-xs text-gray-400 mt-2">Click to upload photo</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-1">
-                <label className="text-sm font-semibold text-gray-700">First Name</label>
-                <input 
-                  name="first_name" 
-                  value={form.first_name}
-                  className="w-full border rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500" 
-                  onChange={handleChange} 
-                  required 
-                />
+            {/* 2. Personal Information */}
+            <section>
+              <h3 className="text-blue-600 font-bold flex items-center gap-2 mb-4"><UserIcon size={18}/> Basic Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Input label="First Name" name="first_name" value={form.first_name} onChange={handleChange} required />
+                <Input label="Last Name" name="last_name" value={form.last_name} onChange={handleChange} required />
+                <Input label="Roll Number" name="roll_number" value={form.roll_number} onChange={handleChange} required />
+                <Input label="Date of Birth" name="date_of_birth" type="date" value={form.date_of_birth} onChange={handleChange} />
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-gray-500 uppercase">Religion</label>
+                  <select name="religion" value={form.religion} onChange={handleChange} className="w-full border rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                    <option value="">Select Religion</option>
+                    <option value="Islam">Islam</option>
+                    <option value="Hinduism">Hinduism</option>
+                    <option value="Christianity">Christianity</option>
+                    <option value="Buddhism">Buddhism</option>
+                  </select>
+                </div>
               </div>
+            </section>
 
-              <div className="space-y-1">
-                <label className="text-sm font-semibold text-gray-700">Last Name</label>
-                <input 
-                  name="last_name" 
-                  value={form.last_name}
-                  className="w-full border rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500" 
-                  onChange={handleChange} 
-                  required 
-                />
+            {/* 3. Academic Details */}
+            <section className="bg-blue-50/50 p-6 rounded-xl border border-blue-100">
+              <h3 className="text-blue-600 font-bold mb-4">Academic Placement</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Select label="Session" name="session_id" value={form.session_id} options={sessions} onChange={handleChange} required />
+                <Select label="Class" name="class_id" value={form.class_id} options={classes} onChange={handleChange} required />
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-gray-500 uppercase">Section</label>
+                  <select 
+                    name="section_id" 
+                    value={form.section_id} 
+                    onChange={handleChange} 
+                    required
+                    className="w-full border rounded-lg p-2.5 bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+                  >
+                    <option value="">Select Section</option>
+                    {sections
+                      .filter(s => s.school_class == form.class_id)
+                      .map(s => <option key={s.id} value={s.id}>{s.name}</option>)
+                    }
+                  </select>
+                </div>
               </div>
+            </section>
 
-              <div className="space-y-1">
-                <label className="text-sm font-semibold text-gray-700">Roll Number</label>
-                <input 
-                  name="roll_number" 
-                  value={form.roll_number}
-                  className="w-full border rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500" 
-                  onChange={handleChange} 
-                  required 
-                />
+            {/* 4. Guardian Information */}
+            <section>
+              <h3 className="text-blue-600 font-bold flex items-center gap-2 mb-4"><Phone size={18}/> Guardian Details</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4 md:border-r md:pr-4 border-gray-100">
+                   <Input label="Father's Name" name="father_name" value={form.father_name} onChange={handleChange} />
+                   <Input label="Father's Contact" name="father_contact" value={form.father_contact} onChange={handleChange} />
+                </div>
+                <div className="space-y-4">
+                   <Input label="Mother's Name" name="mother_name" value={form.mother_name} onChange={handleChange} />
+                   <Input label="Mother's Contact" name="mother_contact" value={form.mother_contact} onChange={handleChange} />
+                </div>
               </div>
+            </section>
 
-              <div className="space-y-1">
-                <label className="text-sm font-semibold text-gray-700">Academic Session</label>
-                <select 
-                  name="session_id" 
-                  value={form.session_id} 
-                  className="w-full border rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500" 
-                  onChange={handleChange} 
-                  required
-                >
-                  <option value="">Select Session</option>
-                  {sessions.map(s => <option key={s.id} value={s.id}>{s.name} {s.is_active ? "(Current Active)" : ""}</option>)}
-                </select>
-              </div>
+            {/* 5. Address */}
+            <section>
+              <h3 className="text-blue-600 font-bold flex items-center gap-2 mb-4"><MapPin size={18}/> Contact Address</h3>
+              <textarea 
+                name="address" 
+                value={form.address} 
+                onChange={handleChange} 
+                rows="3" 
+                placeholder="Village, Post, Upazila, District..."
+                className="w-full border rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </section>
 
-              <div className="space-y-1">
-                <label className="text-sm font-semibold text-gray-700">Class</label>
-                <select 
-                  name="class_id" 
-                  value={form.class_id}
-                  className="w-full border rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500" 
-                  onChange={handleChange} 
-                  required
-                >
-                  <option value="">Select Class</option>
-                  {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </select>
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-sm font-semibold text-gray-700">Section</label>
-                <select 
-                  name="section_id" 
-                  value={form.section_id}
-                  className="w-full border rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500" 
-                  onChange={handleChange} 
-                  required
-                >
-                  <option value="">Select Section</option>
-                  {sections.filter(sec => sec.school_class == form.class_id).map(s => (
-                    <option key={s.id} value={s.id}>{s.name}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="pt-4">
-              <button className={`w-full ${isEditMode ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-blue-600 hover:bg-blue-700'} text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-blue-200`}>
-                {isEditMode ? "Save Changes" : "Confirm & Save Student"}
+            <div className="flex gap-4">
+              <button 
+                type="button"
+                onClick={() => navigate(-1)}
+                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-4 rounded-xl transition-all"
+              >
+                Discard Changes
+              </button>
+              <button 
+                type="submit"
+                className={`flex-[2] ${isEditMode ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-blue-600 hover:bg-blue-700'} text-white font-bold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2`}
+              >
+                <Save size={20} /> {isEditMode ? "Update Student Records" : "Confirm Admission"}
               </button>
             </div>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
     </div>
   );
 }
+
+// Reusable Components
+const Input = ({ label, ...props }) => (
+  <div className="space-y-1">
+    <label className="text-xs font-bold text-gray-500 uppercase">{label}</label>
+    <input className="w-full border rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500 bg-white" {...props} />
+  </div>
+);
+
+const Select = ({ label, options, ...props }) => (
+  <div className="space-y-1">
+    <label className="text-xs font-bold text-gray-500 uppercase">{label}</label>
+    <select className="w-full border rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500 bg-white" {...props}>
+      <option value="">Select {label}</option>
+      {options.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
+    </select>
+  </div>
+);

@@ -4,8 +4,12 @@ from .models import Student, Enrollment
 
 
 class StudentSerializer(serializers.ModelSerializer):
-    # SerializerMethodField allows us to run a small function to find related data
+    # We add ID fields so the frontend "Edit" form can pre-select the dropdowns
+    class_id = serializers.SerializerMethodField()
+    section_id = serializers.SerializerMethodField()
+    session_id = serializers.SerializerMethodField()
     enrollment_id = serializers.SerializerMethodField()
+
     class_name = serializers.SerializerMethodField()
     section_name = serializers.SerializerMethodField()
     session_name = serializers.SerializerMethodField()
@@ -13,27 +17,43 @@ class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
         fields = [
-            'id', 'enrollment_id', 'first_name', 'last_name', 'roll_number',
-            'photo', 'class_name', 'section_name', 'session_name'
+            'id', 'first_name', 'last_name', 'roll_number',
+            'father_name', 'father_contact', 'mother_name', 'mother_contact',
+            'date_of_birth', 'religion', 'address', 'photo',
+            'class_id', 'section_id', 'session_id', 'enrollment_id',
+            'class_name', 'section_name', 'session_name'
         ]
 
+    def get_enrollment(self, obj):
+        return obj.enrollment_set.first()
+
     def get_enrollment_id(self, obj):
-        # Retrieve the ID of the enrollment record for this student
-        enrollment = obj.enrollment_set.first()
-        return enrollment.id if enrollment else None
+        enroll = self.get_enrollment(obj)
+        return enroll.id if enroll else None
+
+    def get_class_id(self, obj):
+        enroll = self.get_enrollment(obj)
+        return enroll.school_class.id if enroll else None
+
+    def get_section_id(self, obj):
+        enroll = self.get_enrollment(obj)
+        return enroll.section.id if enroll else None
+
+    def get_session_id(self, obj):
+        enroll = self.get_enrollment(obj)
+        return enroll.session.id if enroll else None
 
     def get_class_name(self, obj):
-        # We look into the Enrollment table for this student
-        enrollment = obj.enrollment_set.first()
-        return enrollment.school_class.name if enrollment else "Not Enrolled"
+        enroll = self.get_enrollment(obj)
+        return enroll.school_class.name if enroll else "Not Enrolled"
 
     def get_section_name(self, obj):
-        enrollment = obj.enrollment_set.first()
-        return enrollment.section.name if enrollment else "N/A"
+        enroll = self.get_enrollment(obj)
+        return enroll.section.name if enroll else "N/A"
 
     def get_session_name(self, obj):
-        enrollment = obj.enrollment_set.first()
-        return enrollment.session.name if enrollment else "N/A"
+        enroll = self.get_enrollment(obj)
+        return enroll.session.name if enroll else "N/A"
 
 
 class EnrollmentSerializer(serializers.ModelSerializer):

@@ -2,32 +2,53 @@
 import { useEffect, useState } from "react";
 import { getStudents, deleteStudent } from "../../api/studentsApi";
 import { Link } from "react-router-dom";
-import { UserPlus, Eye, Trash2, User } from "lucide-react";
+import { UserPlus, Eye, Trash2, User, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import axios from "../../api/axios";
 
 export default function StudentsList() {
   const [students, setStudents] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
 
-  const loadStudents = async () => {
+  // Pagination State
+  const [pagination, setPagination] = useState({
+    next: null,
+    previous: null,
+    count: 0
+  });
+
+  const loadStudents = async (url = null) => {
     setLoading(true);
     try {
-      const res = await getStudents();
-    
-      // Extract the results array from the paginated response
-      const data = res.data.results ? res.data.results : res.data;
-    
-      setStudents(Array.isArray(data) ? data : []);
+      let res;
+      if (url) {
+        // Use the direct URL from pagination links (maintains search/filter params)
+        res = await axios.get(url);
+      } else {
+        // Initial load or new search query
+        res = await getStudents(null, null, searchTerm);
+      }
+
+      setStudents(res.data.results || []);
+      setPagination({
+        next: res.data.next,
+        previous: res.data.previous,
+        count: res.data.count
+      });
     } catch (err) {
-      console.error("Failed to fetch students", err);
-      setStudents([]); // Safety fallback
+      console.error("Failed to fetch students:", err);
     } finally {
       setLoading(false);
     }
   };
 
+  // Debounced search: calls API 500ms after user stops typing
   useEffect(() => {
-    loadStudents();
-  }, []);
+    const delayDebounceFn = setTimeout(() => {
+      loadStudents();
+    }, 500);
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm]);
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this student record?")) return;
@@ -45,7 +66,7 @@ export default function StudentsList() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Student Directory</h1>
-          <p className="text-sm text-gray-500">Manage and view all enrolled students</p>
+          <p className="text-sm text-gray-500">Total Enrolled: {pagination.count} students</p>
         </div>
         <Link
           to="/students/new"
@@ -53,6 +74,20 @@ export default function StudentsList() {
         >
           <UserPlus size={18} /> Add New Student
         </Link>
+      </div>
+
+      {/* Search Bar Section */}
+      <div className="mb-6 relative max-w-md">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+          <Search size={18} />
+        </div>
+        <input
+          type="text"
+          placeholder="Search all students by name or roll..."
+          className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm transition-all shadow-sm"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
       </div>
 
       {/* Table Section */}
@@ -68,22 +103,25 @@ export default function StudentsList() {
           </thead>
           <tbody className="divide-y divide-gray-50">
             {loading ? (
-              <tr><td colSpan="4" className="p-10 text-center text-gray-400 animate-pulse">Loading directory...</td></tr>
+              <tr>
+                <td colSpan="4" className="p-10 text-center text-gray-400 animate-pulse">
+                  Loading directory...
+                </td>
+              </tr>
             ) : students.length === 0 ? (
-              <tr><td colSpan="4" className="p-10 text-center text-gray-400">No students enrolled yet.</td></tr>
+              <tr>
+                <td colSpan="4" className="p-10 text-center text-gray-400">
+                  {searchTerm ? `No results found for "${searchTerm}"` : "No students enrolled yet."}
+                </td>
+              </tr>
             ) : (
               students.map((student) => (
                 <tr key={student.id} className="hover:bg-blue-50/20 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      {/* Photo Thumbnail */}
                       <div className="w-10 h-10 rounded-full bg-gray-100 border border-gray-200 overflow-hidden flex-shrink-0">
                         {student.photo ? (
-                          <img 
-                            src={student.photo} 
-                            alt={student.first_name} 
-                            className="w-full h-full object-cover" 
-                          />
+                          <img src={student.photo} alt={student.first_name} className="w-full h-full object-cover" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-gray-400">
                             <User size={20} />
@@ -134,6 +172,29 @@ export default function StudentsList() {
             )}
           </tbody>
         </table>
+
+        {/* Pagination Controls */}
+        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+          <p className="text-sm text-gray-500">
+            Showing <span className="font-medium">{students.length}</span> of <span className="font-medium">{pagination.count}</span> students
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => loadStudents(pagination.previous)}
+              disabled={!pagination.previous || loading}
+              className="flex items-center gap-1 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronLeft size={16} /> Previous
+            </button>
+            <button
+              onClick={() => loadStudents(pagination.next)}
+              disabled={!pagination.next || loading}
+              className="flex items-center gap-1 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Next <ChevronRight size={16} />
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

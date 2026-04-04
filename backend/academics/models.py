@@ -56,6 +56,16 @@ class Subject(models.Model):
         blank=True
     )
 
+    # Component Toggles
+    has_written = models.BooleanField(default=True)
+    has_objective = models.BooleanField(default=True)
+    has_practical = models.BooleanField(default=False)
+
+    # Max Mark Constraints
+    max_written = models.FloatField(default=100)
+    max_objective = models.FloatField(default=0)
+    max_practical = models.FloatField(default=0)
+
     class Meta:
         # Useful for finding subjects by their official codes
         ordering = ['school_class', 'code']

@@ -25,7 +25,8 @@ export default function TermReports() {
   useEffect(() => {
     if (filters.class_id && filters.section_id) {
       getStudents(filters.class_id, filters.section_id).then(res => {
-        setStudents(res.data.results || res.data);
+        const studentList = res.data.results || res.data;
+        setStudents(studentList);
       });
     }
   }, [filters.class_id, filters.section_id]);

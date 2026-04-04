@@ -27,4 +27,8 @@ class AcademicSessionSerializer(serializers.ModelSerializer):
 class SubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subject
-        fields = ['id', 'name', 'code', 'school_class']
+        fields = [
+            'id', 'name', 'code', 'school_class',
+            'has_written', 'has_objective', 'has_practical',
+            'max_written', 'max_objective', 'max_practical'
+        ]

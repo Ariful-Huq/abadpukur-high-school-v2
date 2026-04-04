@@ -59,8 +59,12 @@ class Mark(models.Model):
         return "F"
 
     def save(self, *args, **kwargs):
-        self.total_marks = self.written_marks + \
-            self.objective_marks + self.practical_marks
+        # Only add marks if the subject configuration allows that component
+        w = self.written_marks if self.subject.has_written else 0
+        o = self.objective_marks if self.subject.has_objective else 0
+        p = self.practical_marks if self.subject.has_practical else 0
+
+        self.total_marks = w + o + p
         super().save(*args, **kwargs)
 
     def __str__(self):
