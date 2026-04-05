@@ -1,3 +1,4 @@
+# abadpukur-high-school/backend/backend/settings.py
 """
 Django settings for backend project.
 
@@ -23,12 +24,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-s=8fr79a)nsf&^(15frc-av!#fb!%j%*@)068&hvamvruj)av1'
+# SECURITY: Pull from .env
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-default-change-me')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.68.100']
+# Convert comma-separated string from .env to a list
+ALLOWED_HOSTS = os.environ.get(
+    'ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
 
 
 # Application definition
@@ -96,8 +100,12 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),  # Pulled from .env
+        'HOST': os.environ.get('DB_HOST', 'postgres'),
+        'PORT': '5432',
     }
 }
 
@@ -137,14 +145,23 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+# Essential for Nginx to find admin CSS
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Update CORS for both Vite Web and Expo Mobile
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # Vite React dev server
-    "http://192.168.0.108:19000",  # Expo LAN (check expo start QR/terminal)
+    "http://34.177.86.52",         # GCP VM Public IP
+    "http://localhost:5173",       # Local Vite React server
+    # "http://192.168.0.108:19000",  # Expo LAN (check expo start QR/terminal)
     "http://192.168.0.108:8081",   # Expo Metro bundler
-    "exp://192.168.0.108:19000",   # Expo scheme (no http)
+    # "exp://192.168.0.108:19000",   # Expo scheme (no http)
     # Add "*" temporarily for dev: but insecure
 ]
+# If testing on mobile is difficult, you can temporarily use:
+# CORS_ALLOW_ALL_ORIGINS = True
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -165,8 +182,3 @@ SIMPLE_JWT = {
 }
 
 AUTH_USER_MODEL = 'users.User'
-
-
-# Base directory for uploaded files
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
