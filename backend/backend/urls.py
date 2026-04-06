@@ -20,17 +20,20 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
-from rest_framework_simplejwt.views import ( TokenObtainPairView, TokenRefreshView )
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView, TokenRefreshView)
 from users.serializers import MyTokenObtainPairSerializer
+
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path("api/token/", MyTokenObtainPairView.as_view()),
-    path("api/token/refresh/", TokenRefreshView.as_view()),
+    path("api/v1/token/", MyTokenObtainPairView.as_view()),
+    path("api/v1/token/refresh/", TokenRefreshView.as_view()),
 
 
     path("api/v1/", include("api.v1.urls")),
@@ -38,4 +41,5 @@ urlpatterns = [
 
 # This allows you to view uploaded photos in your browser during development
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.MEDIA_URL,
+                          document_root=settings.MEDIA_ROOT)

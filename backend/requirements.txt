@@ -1,4 +1,4 @@
-//abadpukur-high-school/backend/requirements.txt
+# abadpukur-high-school/backend/requirements.txt
 asgiref==3.11.1
 Django==6.0.3
 django-cors-headers==4.9.0

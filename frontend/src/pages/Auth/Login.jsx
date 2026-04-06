@@ -1,7 +1,7 @@
 // src/pages/Auth/Login.jsx
 import { useState, useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
-import axios from "axios";
+import API from "../../api/axios";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
@@ -17,7 +17,7 @@ export default function Login() {
     setError("");
 
     try {
-      const res = await axios.post("http://127.0.0.1:8000/api/token/", {
+      const res = await API.post("token/", {
         username,
         password,
       });
