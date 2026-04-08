@@ -1,14 +1,18 @@
 // src/pages/Users/UserManagement.jsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
 import API from "../../api/axios";
+import { forceLogoutUser, adminResetPassword } from "../../api/authApi";
 import { formatDistanceToNow } from "date-fns"; // Standard for relative time
 import { 
   UserPlus, Edit, Trash2, Loader2, 
   ToggleLeft, ToggleRight, Search, X, 
-  ChevronUp, ChevronDown, UserCircle, Clock 
+  ChevronUp, ChevronDown, UserCircle, Clock,
+  Key, LogOut
 } from "lucide-react";
 
 export default function UserManagement() {
+  const { user: currentUser } = useContext(AuthContext); // Get the logged-in user
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,7 +33,7 @@ export default function UserManagement() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const res = await API.get("users/users/");
+      const res = await API.get("users/");
       const data = Array.isArray(res.data) ? res.data : (res.data.results || []);
       setUsers(data);
     } catch (err) {
@@ -96,9 +100,9 @@ export default function UserManagement() {
       if (isEditing) {
         const payload = { ...formData };
         if (!payload.password) delete payload.password;
-        await API.patch(`users/users/${selectedUserId}/`, payload);
+        await API.patch(`users/${selectedUserId}/`, payload);
       } else {
-        await API.post("users/users/", formData);
+        await API.post("users/", formData);
       }
       setShowModal(false);
       fetchUsers();
@@ -109,7 +113,7 @@ export default function UserManagement() {
 
   const toggleStatus = async (user) => {
     try {
-      await API.patch(`users/users/${user.id}/`, { is_active: !user.is_active });
+      await API.patch(`users/${user.id}/`, { is_active: !user.is_active });
       fetchUsers();
     } catch (err) {
       console.error("Status update failed", err);
@@ -119,7 +123,7 @@ export default function UserManagement() {
   const deleteUser = async (id) => {
     if (window.confirm("Are you sure? This action cannot be undone.")) {
       try {
-        await API.delete(`users/users/${id}/`);
+        await API.delete(`users/${id}/`);
         fetchUsers();
       } catch (err) {
         alert("Delete failed.");
@@ -139,6 +143,29 @@ export default function UserManagement() {
       </div>
     );
   }
+
+  const handleForceLogout = async (u) => {
+    if (window.confirm(`Force log out ${u.username}?`)) {
+      try {
+        await forceLogoutUser(u.id);
+        alert("User logged out successfully.");
+      } catch (err) {
+        alert("Action failed.");
+      }
+    }
+  };
+
+  const handleResetPassword = async (u) => {
+    const newPass = prompt(`New password for ${u.username}:`);
+    if (newPass && newPass.length >= 6) {
+      try {
+        await adminResetPassword(u.id, newPass);
+        alert("Password updated!");
+      } catch (err) {
+        alert("Update failed.");
+      }
+    }
+  };
 
   return (
     <div className="p-6">
@@ -233,6 +260,19 @@ export default function UserManagement() {
                     </td>
                     <td className="p-5">
                       <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {/* 1. Only show Reset Password if the user is NOT the one logged in */}
+                        {u.id !== currentUser?.user_id && u.username !== "admin" && (
+                          <button onClick={() => handleResetPassword(u)} className="p-2 text-gray-400 hover:text-yellow-500" title="Reset Password">
+                            <Key size={18} />
+                          </button>
+                        )}
+                        {/* 2. Only show Force Logout if the user is NOT the one logged in */}
+                        {u.id !== currentUser?.user_id && u.username !== "admin" && (
+                          <button onClick={() => handleForceLogout(u)} className="p-2 text-gray-400 hover:text-orange-500" title="Force Logout">
+                            <LogOut size={18} />
+                          </button>
+                        )}
+                        {/* Keep Edit and Delete as they are, or apply similar logic to Delete */}
                         <button 
                           onClick={() => handleOpenEdit(u)}
                           className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition"
@@ -240,13 +280,15 @@ export default function UserManagement() {
                         >
                           <Edit size={18} />
                         </button>
-                        <button 
-                          onClick={() => deleteUser(u.id)} 
-                          className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-900/20 rounded-lg transition"
-                          title="Delete User"
-                        >
-                          <Trash2 size={18} />
-                        </button>
+                        {u.id !== currentUser?.user_id && u.username !== "admin" && (
+                          <button 
+                            onClick={() => deleteUser(u.id)} 
+                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-900/20 rounded-lg transition"
+                            title="Delete User"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

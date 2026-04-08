@@ -1,0 +1,222 @@
+d:/abadpukur-high-school/
+│
+├──backend/
+│   │
+│   ├── academics/                   # Academic structure
+│   │   ├── __init__.py
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── models.py                # Class, Section, Subject, AcademicSession
+│   │   ├── serializers.py
+│   │   ├── tests.py
+│   │   ├── urls.py
+│   │   └── views.py                 # ViewSets for classes, sections, subjects
+│   │
+│   ├── api/                       	 # API versioning
+│   │   └── v1/
+│   │       └── urls.py              # Combine all app routers
+│   │
+│   ├── attendance/
+│   │   ├── __init__.py
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── models.py
+│   │   ├── serializers.py
+│   │   ├── tests.py
+│   │   ├── urls.py
+│   │   └── views.py
+│   │
+│   ├── backend/                     # Django project folder
+│   │   ├── __init__.py
+│   │   ├── asgi.py
+│   │   ├── settings.py
+│   │   ├── urls.py
+│   │   └── wsgi.py
+│   │
+│   ├── dashboard/                	# Dashboards
+│   │   ├── __init__.py
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── models.py
+│   │   ├── tests.py
+│   │   ├── urls.py
+│   │   └── views.py
+│   │
+│   ├── fees/
+│   │   ├── __init__.py
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── models.py                # Fee structure, payment
+│   │   ├── serializers.py
+│   │   ├── tests.py
+│   │   ├── urls.py
+│   │   └── views.py
+│   │   
+│   ├── media/
+│   │   ├── students
+│   │   │   └── photos
+│   │   └── teachers
+│   │       └── photos
+│   │
+│   ├── results/
+│   │   ├── __init__.py
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── models.py                # Result structure
+│   │   ├── serializers.py
+│   │   ├── tests.py
+│   │   ├── urls.py
+│   │   └── views.py
+│   │
+│   ├── routine/
+│   │   ├──management
+│	│   │	└──commands
+│	│   │		└──create_periods.py
+│   │   ├── __init__.py
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── models.py                # Period, ClassRoutine
+│   │   ├── serializers.py
+│   │   ├── tests.py
+│   │   ├── urls.py
+│   │   └── views.py
+│   │
+│   ├── settings_app/                # School-level configuration
+│   │   ├── __init__.py
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── models.py                # SchoolSettings, GradingSystem, Term
+│   │   ├── serializers.py
+│   │   ├── tests.py
+│   │   ├── urls.py
+│   │   └── views.py
+│   │
+│   ├── students/
+│   │   ├── __init__.py
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── models.py                # Student, Enrollment
+│   │   ├── serializers.py
+│   │   ├── tests.py
+│   │   ├── urls.py
+│   │   └── views.py
+│   │
+│   ├── teachers/
+│   │   ├── __init__.py
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── models.py                # Teacher, SubjectAssignments
+│   │   ├── serializers.py
+│   │   ├── tests.py
+│   │   ├── urls.py
+│   │   └── views.py
+│   │
+│   ├── users/                       # Authentication & roles
+│   │   ├── __init__.py
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── models.py                # Custom User model
+│   │   ├── serializers.py
+│   │   ├── tests.py
+│   │   ├── urls.py
+│   │   └── views.py
+│   │
+│   ├── db.sqlite3
+│   ├── Dockerfile
+│   ├── manage.py
+│   └── requirements.txt
+│
+│
+├── frontend/
+│   │ 
+│   ├── public/
+│   │   ├── abadpukur-high-school-logo.svg
+│   │   └── logo.png
+│   ├── src/
+│   │   ├── api/
+│   │   │   ├── academicsApi.js
+│   │   │   ├── attendanceApi.js
+│   │   │   ├── authApi.js
+│   │   │   ├── axios.js
+│   │   │   ├── dashboardApi.js
+│   │   │   ├── feesApi.js
+│   │   │   ├── resultsApi.js
+│   │   │   ├── routineApi.js
+│   │   │   ├── studentsApi.js
+│   │   │   └── teachersApi.js
+│   │   ├── assets/
+│   │   ├── components/
+│   │   │   ├── layout/
+│   │   │   │   ├── AppLayout.jsx
+│   │   │   │   ├── Sidebar.jsx
+│   │   │   │   └── Topbar.jsx
+│   │   │   ├── ui/
+│   │   │   │   ├── Button.jsx
+│   │   │   │   ├── Card.jsx
+│   │   │   │   ├── Modal.jsx
+│   │   │   │   └── Table.jsx
+│   │   │   └── ProtectedRoute.jsx
+│   │   ├── config/
+│   │   │   └── menuConfig.js
+│   │   ├── context/
+│   │   │   └── AuthContext.jsx
+│   │   ├── hooks/
+│   │   │   └── useFetch.js
+│   │   ├── pages/
+│   │   │   ├── Academics/
+│   │   │   │   ├── AcademicSessions.jsx
+│   │   │   │   ├── Classes.jsx
+│   │   │   │   ├── Sections.jsx
+│   │   │   │   └── Subjects.jsx
+│   │   │   ├── Attendance/
+│   │   │   │   ├── MarkAttendance.jsx
+│   │   │   │   └── MonthlyAttendance.jsx
+│   │   │   ├── Auth/
+│   │   │   │   └── Login.jsx
+│   │   │   ├── Dashboard/
+│   │   │   │   └── Dashboard.jsx
+│   │   │   ├── Fees/
+│   │   │   │   ├── DefaulterList.jsx
+│   │   │   │   ├── FeeStructures.jsx
+│   │   │   │   └── Payments.jsx
+│   │   │   ├── Logs/
+│   │   │   │   └── LogManagement.jsx
+│   │   │   ├── Results/
+│   │   │   │   ├── ExamSetup.jsx
+│   │   │   │   ├── MarkEntry.jsx
+│   │   │   │   ├── TabulationSheet.jsx
+│   │   │   │   └── TermReports.jsx
+│   │   │   ├── Routine/
+│   │   │   │   ├── Periods.jsx
+│   │   │   │   └── RoutineTable.jsx
+│   │   │   ├── Students/
+│   │   │   │   ├── StudentForm.jsx
+│   │   │   │   ├── StudentProfile.jsx
+│   │   │   │   └── StudentsList.jsx
+│   │   │   ├── Teachers/
+│   │   │   │   ├── TeacherForm.jsx
+│   │   │   │   ├── TeacherProfile.jsx
+│   │   │   │   └── TeachersList.jsx
+│   │   │   ├── Users/
+│   │   │   │   └── UserManagement.jsx
+│   │   │   └── index.js
+│   │   ├── routes/
+│   │   │   └── AppRouter.jsx
+│   │   ├── utils/
+│   │   │   └── constants.js
+│   │   ├── App.jsx
+│   │   ├── index.css
+│   │   └── main.jsx
+│   ├── .gitignore
+│   ├── Dockerfile
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── nginx-frontend.conf
+│   ├── package.json
+│   ├── tailwind.config.js
+│   └── vite.config.js
+├── nginx
+│   └── nginx.conf
+├── .env
+├── .gitignore
+└── docker-compose.yml

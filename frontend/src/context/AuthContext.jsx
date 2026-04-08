@@ -1,6 +1,8 @@
+// frontend/src/context/AuthContext.jsx
 import { createContext, useState } from "react";
-// 1. Ensure the import name matches the usage
 import { jwtDecode } from "jwt-decode"; 
+// Import the API call
+import { logout as logoutAPI } from "../api/authApi"; 
 
 export const AuthContext = createContext();
 
@@ -9,11 +11,10 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem("access_token");
     if (token) {
       try {
-        // 2. Use the correct function name: jwtDecode
         return jwtDecode(token);
       } catch (err) {
         console.error("Invalid token on initial load", err);
-        localStorage.removeItem("access_token"); // Clean up bad tokens
+        localStorage.removeItem("access_token");
         return null;
       }
     }
@@ -30,9 +31,27 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem("access_token");
-    setUser(null);
+  // --- UPDATED LOGOUT LOGIC ---
+  const logout = async () => {
+    try {
+      const refresh = localStorage.getItem("refresh_token");
+      if (refresh) {
+        // Notify backend to blacklist token and create Audit Log
+        await logoutAPI(refresh);
+      }
+    } catch (err) {
+      // We log the error but proceed with frontend logout anyway
+      console.error("Backend logout failed", err);
+    } finally {
+      // Clear all local data and state
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+      localStorage.removeItem("user");
+      setUser(null);
+      
+      // Optional: Force redirect to login page
+      window.location.href = "/login";
+    }
   };
 
   return (

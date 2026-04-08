@@ -4,7 +4,7 @@ from .views import TeacherViewSet, SubjectAssignmentViewSet
 
 router = DefaultRouter()
 
-router.register("teachers", TeacherViewSet)
+router.register("", TeacherViewSet, basename="teachers")
 router.register("subject-assignments", SubjectAssignmentViewSet)
 
 urlpatterns = router.urls

@@ -1,4 +1,3 @@
-# abadpukur-high-school/backend/backend/settings.py
 """
 Django settings for backend project.
 
@@ -24,15 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECURITY: Pull from .env
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-default-change-me')
+SECRET_KEY = 'django-insecure-s=8fr79a)nsf&^(15frc-av!#fb!%j%*@)068&hvamvruj)av1'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+DEBUG = True
 
-# Convert comma-separated string from .env to a list
-ALLOWED_HOSTS = os.environ.get(
-    'ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.68.100']
 
 
 # Application definition
@@ -52,6 +48,7 @@ INSTALLED_APPS = [
     'django_extensions',
 
     # Local apps
+    'rest_framework_simplejwt.token_blacklist',
     'users',
     'academics',
     'students',
@@ -98,25 +95,12 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-# Temporarily switch back to SQLite uncomment below part
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
-# Comment this out for a moment to switch back to SQLite:
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': os.environ.get('DB_NAME'),
-#         'USER': os.environ.get('DB_USER'),
-#         'PASSWORD': os.environ.get('DB_PASSWORD'),  # Pulled from .env
-#         'HOST': os.environ.get('DB_HOST', 'postgres'),
-#         'PORT': '5432',
-#     }
-# }
 
 
 # Password validation
@@ -154,27 +138,22 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
-# Essential for Nginx to find admin CSS
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-# Update CORS for both Vite Web and Expo Mobile
 CORS_ALLOWED_ORIGINS = [
-    "http://34.177.86.52",         # GCP VM Public IP
-    "http://localhost:5173",       # Local Vite React server
-    # "http://192.168.0.108:19000",  # Expo LAN (check expo start QR/terminal)
-    "http://192.168.0.108:8081",   # Expo Metro bundler
-    # "exp://192.168.0.108:19000",   # Expo scheme (no http)
+    "http://localhost:5173",       # Vite React
+    "http://127.0.0.1:5173",       # Vite React (alternative)
+    "http://192.168.68.100:19000",  # Expo LAN
+    "http://192.168.68.100:8081",  # Expo Metro Bundler (Newer versions)
+    "http://192.168.68.100:8000",  # Allow self-requests via IP
     # Add "*" temporarily for dev: but insecure
 ]
-# If testing on mobile is difficult, you can temporarily use:
-# CORS_ALLOW_ALL_ORIGINS = True
 
 REST_FRAMEWORK = {
+    # 'DEFAULT_AUTHENTICATION_CLASSES': (
+    #    'rest_framework_simplejwt.authentication.JWTAuthentication',
+    # ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'users.authentication.VersionedJWTAuthentication',  # Use the new class
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -185,9 +164,20 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": True,    # Must be True for blacklisting to work well
+    "BLACKLIST_AFTER_ROTATION": True,  # Automatically blacklists old tokens
     "UPDATE_LAST_LOGIN": True,
+
+    # CRITICAL FOR INSTANT LOGOUT:
+    # "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    # "CHECK_REVOCATIONS": True,
 }
 
 AUTH_USER_MODEL = 'users.User'
+
+
+# Base directory for uploaded files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

@@ -52,36 +52,66 @@ export default function LogManagement() {
       </div>
 
       <div className="space-y-4">
-        {filteredLogs.map((log) => (
-          <div key={log.id} className="bg-gray-900 border border-gray-800 p-4 rounded-2xl flex items-start gap-4 hover:border-gray-700 transition">
-            <div className={`p-3 rounded-xl ${
-              log.action === 'DELETE' ? 'bg-red-500/10 text-red-500' : 
-              log.action === 'CREATE' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-blue-500/10 text-blue-500'
-            }`}>
-              <Activity size={20} />
-            </div>
-            
-            <div className="flex-1">
-              <div className="flex justify-between">
-                <span className="text-xs font-black uppercase tracking-widest text-gray-500">{log.action}</span>
-                <span className="text-xs text-gray-500 flex items-center gap-1">
-                  <Clock size={12} /> {format(new Date(log.timestamp), "PPp")}
-                </span>
+        {filteredLogs.length > 0 ? (
+          filteredLogs.map((log) => (
+            <div 
+              key={log.id} 
+              className="bg-gray-900 border border-gray-800 p-4 rounded-2xl flex items-start gap-4 hover:border-gray-700 transition"
+            >
+              {/* Icon Container with Dynamic Colors */}
+              <div className={`p-3 rounded-xl ${
+                log.action === 'DELETE' ? 'bg-red-500/10 text-red-500' : 
+                log.action === 'CREATE' ? 'bg-emerald-500/10 text-emerald-500' : 
+                log.action === 'UPDATE' ? 'bg-amber-500/10 text-amber-500' :
+                log.action === 'LOGIN' ? 'bg-purple-500/10 text-purple-500' :
+                log.action === 'LOGOUT' ? 'bg-orange-500/10 text-orange-500' :
+                'bg-blue-500/10 text-blue-500'
+              }`}>
+                <Activity size={20} />
               </div>
-              <p className="text-gray-200 mt-1">{log.description}</p>
-              <div className="flex items-center gap-2 mt-2 text-sm text-gray-500">
-                <User size={14} />
-                <span>By: <b className="text-gray-400">{log.performed_by_name || "System/Unknown"}</b></span>
-              </div>
-              {log.ip_address && (
-                <div className="flex items-center gap-1.5 px-2 py-1 bg-gray-800/50 border border-gray-700 rounded text-[11px] font-mono text-blue-400">
-                  <Activity size={12} />
-                  <span>IP: {log.ip_address}</span>
+              
+              <div className="flex-1">
+                <div className="flex justify-between items-start">
+                  <span className={`text-xs font-black uppercase tracking-widest ${
+                     log.action === 'DELETE' ? 'text-red-400' : 
+                     log.action === 'CREATE' ? 'text-emerald-400' : 
+                     'text-gray-500'
+                  }`}>
+                    {log.action}
+                  </span>
+                  <span className="text-xs text-gray-500 flex items-center gap-1">
+                    <Clock size={12} /> {format(new Date(log.timestamp), "PPp")}
+                  </span>
                 </div>
-              )}
+      
+                <p className="text-gray-200 mt-1">{log.description}</p>
+                
+                <div className="flex flex-wrap items-center gap-4 mt-3">
+                  {/* Performed By */}
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <User size={14} />
+                    <span>By: <b className="text-gray-400">{log.performed_by_name || "System/Unknown"}</b></span>
+                  </div>
+
+                  {/* IP Address Tag */}
+                  {log.ip_address && (
+                    <div className="flex items-center gap-1.5 px-2 py-0.5 bg-gray-800/50 border border-gray-700 rounded text-[11px] font-mono text-blue-400/80">
+                      <Activity size={10} />
+                      <span>{log.ip_address}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
+          ))
+        ) : (
+          /* Empty State */
+          <div className="flex flex-col items-center justify-center py-20 bg-gray-900/30 border-2 border-dashed border-gray-800 rounded-3xl">
+            <ClipboardList size={48} className="text-gray-700 mb-4" />
+            <p className="text-gray-500 font-medium">No activity logs found</p>
+            <p className="text-gray-600 text-xs">Try adjusting your search filters.</p>
           </div>
-        ))}
+        )}
       </div>
     </div>
   );

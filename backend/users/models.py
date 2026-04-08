@@ -17,10 +17,12 @@ class User(AbstractUser):
 
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
     phone = models.CharField(max_length=15, blank=True, null=True)
+    force_logout_timestamp = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.username
-    
+
+
 class AuditLog(models.Model):
     ACTION_CHOICES = [
         ('CREATE', 'Created'),
@@ -29,9 +31,10 @@ class AuditLog(models.Model):
         ('LOGIN', 'Logged In'),
     ]
 
-    performed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    performed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     action = models.CharField(max_length=10, choices=ACTION_CHOICES)
-    target_model = models.CharField(max_length=50) # e.g., "User", "Student"
+    target_model = models.CharField(max_length=50)  # e.g., "User", "Student"
     target_id = models.CharField(max_length=50, null=True)
     description = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -39,6 +42,6 @@ class AuditLog(models.Model):
 
     class Meta:
         ordering = ['-timestamp']
-    
+
     def __str__(self):
         return f"{self.action} by {self.performed_by} from {self.ip_address}"
